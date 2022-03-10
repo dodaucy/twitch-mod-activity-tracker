@@ -1,0 +1,94 @@
+{
+    "required_optional_footer": "<> erforderlich | [] optional",
+    "commands": {
+        "help": {
+            "display_name": "help",
+            "description": "Zeigt eine Liste von Befehlen an",
+            "arguments": {
+                "command": {
+                    "display_name": "Befehl",
+                    "description": "Der Befehl für den die Informationen angezeigt werden sollen",
+                    "marked_as_optional": true  // do not edit
+                }
+            },
+            "embed": {
+                "title": "Befehle"
+            }
+        },
+        "top": {
+            "display_name": "top",
+            "description": "Zeigt die 5 aktivsten Mods an",
+            "embed": {
+                "title": "Top 5 Mods"
+            }
+        },
+        "list": {
+            "display_name": "modlist",
+            "description": "Zeigt eine Liste der aktivsten Mods an",
+            "arguments": {
+                "action": {
+                    "display_name": "Aktion",
+                    "description": "Aktion für die die aktivsten Mods angezeigt werden sollen",
+                    "marked_as_optional": true  // do not edit
+                }
+            },
+            "embed": {
+                "title": "Top 50 Mods",
+                "total": "Insgesammt **{total}** Modaktionen",
+                "specialized": {
+                    "title": "Top 50 Mods die `{action}` ausgeführt haben",
+                    "total": "`{action}` wurde bereits **{total}** mal ausgeführt"
+                }
+            }
+        },
+        "stats": {
+            "display_name": "stats",
+            "description": "Zeigt Statistiken über einen bestimmten Mod an",
+            "arguments": {
+                "moderator": {
+                    "display_name": "Moderator",
+                    "description": "Der Twitch Benutzername eines Moderators",
+                    "marked_as_optional": false  // do not edit
+                }
+            },
+            "embed": {
+                "title": "`{mod}` Aktionen",
+                "total": "`{mod}` hat bereits **{total}** Aktionen ausgeführt",
+                "mod_not_found": {
+                    "title": "Mod nicht gefunden",
+                    "description": "Mod `{mod}` wurde nicht gefunden"
+                }
+            }
+        },
+        "about": {
+            "display_name": "about",
+            "description": "Zeigt generelle Informationen über den Bot an"
+        }
+    },
+    "actions": {
+        "MOD_USER": "Mods hinzugefügt",
+        "UNMOD_USER": "Mods entfernt",
+        "VIP_USER": "VIPs hinzugefügt",
+        "UNVIP_USER": "VIPs entfernt",
+        "CHAT_CLEAR": "Chat geleert",
+        "DELETE_MESSAGE": "Nachrichten gelöscht",
+        "TIMEOUT_USER": "Benutzer getimeouted",
+        "UNTIMEOUT_USER": "Timeoutes entfernt",
+        "BAN_USER": "Benutzer gebannt",
+        "UNBAN_USER": "Benutzer entbannt",
+        "SLOW_ON": "Langsamer Modus aktiviert",
+        "SLOW_OFF": "Langsamer Modus deaktiviert",
+        "EMOTES_ONLY_ON": "Nur Emote Modus aktiviert",
+        "EMOTES_ONLY_OFF": "Nur Emote Modus deaktiviert",
+        "FOLLOWERS_ONLY_ON": "Nur Follower Modus aktiviert",
+        "FOLLOWERS_ONLY_OFF": "Nur Follower Modus deaktiviert",
+        "SUBS_ONLY_ON": "Nur Abonnenten Modus aktiviert",
+        "SUBS_ONLY_OFF": "Nur Abonnenten Modus deaktiviert",
+        "BLOCKED_TERM_ADD": "Wörter auf die Blacklist gesetzt",
+        "BLOCKED_TERM_REMOVE": "Wörter von der Backlist entfernt",
+        "PERMITTED_TERM_ADD": "Wörter auf die Whitelist gesetzt",
+        "PERMITTED_TERM_REMOVE": "Wörter von der Whitelist entfernt",
+        "UNIQUE_ON": "Spamschutz aktiviert",
+        "UNIQUE_OFF": "Spamschutz deaktiviert"
+    }
+}

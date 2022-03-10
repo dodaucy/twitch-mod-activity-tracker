@@ -1,0 +1,197 @@
+##################################################################
+#                                                                #
+#                   twitch mod activity tracker                  #
+#                                                                #
+#                Copyright (C) 2022 X Gamer Guide                #
+#  https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker  #
+#                                                                #
+##################################################################
+
+
+from typing import Optional
+
+import disnake
+from disnake.ext import commands
+
+from config import config, language
+from twitch import get_mod_actions
+from utils import command_help, get_action, get_actions, get_command
+
+
+bot = commands.Bot(sync_commands=True)
+
+
+@bot.event
+async def on_ready():
+    get_mod_actions.start()
+    print("Online")
+
+
+@bot.slash_command(
+    name=language.commands.help.display_name,
+    description=language.commands.help.description
+)
+async def help(
+    inter: disnake.ApplicationCommandInteraction,
+    command: Optional[str] = commands.Param(
+        None,
+        name=language.commands.help.arguments.command.display_name,
+        description=language.commands.help.arguments.command.description,
+        choices=[language.commands[command].display_name for command in language.commands]
+    )
+):
+    if command is None:
+        embed = disnake.Embed(
+            title=language.commands.help.embed.title,
+            description="\n".join([f"{command_help(command)}\n{language.commands[command].description}" for command in language.commands]),
+            color=config.discord.embed.color.normal
+        )
+    else:
+        command = get_command(command)
+        embed = disnake.Embed(
+            title=command_help(command),
+            description=language.commands[command].description,
+            color=config.discord.embed.color.normal
+        )
+    embed.set_footer(text=language.required_optional_footer)
+    await inter.response.send_message(
+        embed=embed,
+        ephemeral=config.discord.embed.ephemeral
+    )
+
+
+@bot.slash_command(
+    name=language.commands.top.display_name,
+    description=language.commands.top.description
+)
+async def top(
+    inter: disnake.ApplicationCommandInteraction
+):
+    embed = disnake.Embed(
+        title=language.commands.top.embed.title,
+        color=config.discord.embed.color.normal
+    )
+    mods = get_actions(True)
+    for place, (mod, actions) in enumerate(sorted(mods.items(), key=lambda x: sum(x[1].values()), reverse=True)):
+        if place >= 5:
+            break
+        action_list = []
+        for action in sorted(mods[mod], key=lambda x: mods[mod][x], reverse=True):
+            action_list.append(f"{language.actions.get(action, action)}: **{actions[action]}**")
+        embed.add_field(
+            name=f"{place + 1}. {mod} | `{sum(actions.values())}`",
+            value="\n".join(action_list),
+            inline=False
+        )
+    await inter.response.send_message(
+        embed=embed,
+        ephemeral=config.discord.embed.ephemeral
+    )
+
+
+@bot.slash_command(
+    name=language.commands.list.display_name,
+    description=language.commands.list.description
+)
+async def list(
+    inter: disnake.ApplicationCommandInteraction,
+    action: Optional[str] = commands.Param(
+        None,
+        name=language.commands.list.arguments.action.display_name,
+        description=language.commands.list.arguments.action.description,
+        choices=[language.actions[action] for action in language.actions]
+    )
+):
+    mod_list = []
+    if action is None:
+        total_actions = 0
+        for place, (mod, actions) in enumerate(sorted(get_actions(True).items(), key=lambda x: sum(x[1].values()), reverse=True)):
+            for action in actions:
+                total_actions += actions[action]
+            if place >= 50:
+                continue
+            mod_list.append(f"**{place + 1}.** `{mod}`: {sum(actions.values())}")
+        description = "\n".join(mod_list)
+        embed = disnake.Embed(
+            title=language.commands.list.embed.title,
+            description=f"{language.commands.list.embed.total.format(total=total_actions)}\n\n{description}",
+            color=config.discord.embed.color.normal
+        )
+    else:
+        total_count = 0
+        for place, (mod, count) in enumerate(sorted(get_actions()[get_action(action)].items(), key=lambda x: x[1], reverse=True)):
+            total_count += count
+            if place >= 50:
+                continue
+            mod_list.append(f"**{place + 1}.** `{mod}`: {count}")
+        description = "\n".join(mod_list)
+        embed = disnake.Embed(
+            title=language.commands.list.embed.specialized.title.format(action=action),
+            description=f"{language.commands.list.embed.specialized.total.format(total=total_count, action=action)}\n\n{description}",
+            color=config.discord.embed.color.normal
+        )
+    await inter.response.send_message(
+        embed=embed,
+        ephemeral=config.discord.embed.ephemeral
+    )
+
+
+@bot.slash_command(
+    name=language.commands.stats.display_name,
+    description=language.commands.stats.description
+)
+async def stats(
+    inter: disnake.ApplicationCommandInteraction,
+    moderator: str = commands.Param(
+        name=language.commands.stats.arguments.moderator.display_name,
+        description=language.commands.stats.arguments.moderator.description
+    )
+):
+    mods = get_actions(True)
+    if moderator in mods:
+        action_list = []
+        total_actions = 0
+        for action in sorted(mods[moderator], key=lambda x: mods[moderator][x], reverse=True):
+            total_actions += mods[moderator][action]
+            action_list.append(f"{language.actions.get(action, action)}: **{mods[moderator][action]}**")
+        description = "\n".join(action_list)
+        embed = disnake.Embed(
+            title=language.commands.stats.embed.title.format(mod=moderator),
+            description=f"{language.commands.stats.embed.total.format(total=total_actions, mod=moderator)}\n\n{description}",
+            color=config.discord.embed.color.normal
+        )
+        await inter.response.send_message(
+            embed=embed,
+            ephemeral=config.discord.embed.ephemeral
+        )
+    else:
+        embed = disnake.Embed(
+            title=language.commands.stats.embed.mod_not_found.title,
+            description=language.commands.stats.embed.mod_not_found.description.format(mod=moderator),
+            color=config.discord.embed.color.error
+        )
+        await inter.response.send_message(
+            embed=embed,
+            ephemeral=config.discord.embed.ephemeral
+        )
+
+
+@bot.slash_command(
+    name=language.commands.about.display_name,
+    description=language.commands.about.description
+)
+async def about(
+    inter: disnake.ApplicationCommandInteraction,
+):
+    embed = disnake.Embed(
+        description="Visit on GitHub: https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker",
+        color=config.discord.embed.color.normal
+    )
+    embed.set_author(
+        name="Copyright (C) 2022 X Gamer Guide",
+        url="https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker"
+    )
+    await inter.response.send_message(
+        embed=embed,
+        ephemeral=config.discord.embed.ephemeral
+    )

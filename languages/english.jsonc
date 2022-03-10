@@ -1,0 +1,94 @@
+{
+    "required_optional_footer": "<> required | [] optional",
+    "commands": {
+        "help": {
+            "display_name": "help",
+            "description": "Displays a list of commands",
+            "arguments": {
+                "command": {
+                    "display_name": "command",
+                    "description": "The command for which information should be displayed",
+                    "marked_as_optional": true  // do not edit
+                }
+            },
+            "embed": {
+                "title": "Commands"
+            }
+        },
+        "top": {
+            "display_name": "top",
+            "description": "Displays the 5 most active mods",
+            "embed": {
+                "title": "Top 5 mods"
+            }
+        },
+        "list": {
+            "display_name": "modlist",
+            "description": "Displays a list of the most active mods",
+            "arguments": {
+                "action": {
+                    "display_name": "action",
+                    "description": "Action for which the most active mods should be displayed",
+                    "marked_as_optional": true  // do not edit
+                }
+            },
+            "embed": {
+                "title": "Top 50 mods",
+                "total": "**{total}** mod actions in total",
+                "specialized": {
+                    "title": "Top 50 mods the executed `{action}`",
+                    "total": "`{action}` was executed **{total}** times in total"
+                }
+            }
+        },
+        "stats": {
+            "display_name": "stats",
+            "description": "Displays statistics about a specific mod",
+            "arguments": {
+                "moderator": {
+                    "display_name": "moderator",
+                    "description": "A twitch name from a moderator",
+                    "marked_as_optional": false  // do not edit
+                }
+            },
+            "embed": {
+                "title": "`{mod}` actions",
+                "total": "**{total}** mod actions from `{mod}` in total",
+                "mod_not_found": {
+                    "title": "Mod not found",
+                    "description": "Mod `{mod}` was not found"
+                }
+            }
+        },
+        "about": {
+            "display_name": "about",
+            "description": "Shows general information about the bot"
+        }
+    },
+    "actions": {
+        "MOD_USER": "added mods",
+        "UNMOD_USER": "removed mods",
+        "VIP_USER": "added VIPs",
+        "UNVIP_USER": "removed VIPs",
+        "CHAT_CLEAR": "cleared chat",
+        "DELETE_MESSAGE": "deleted messages",
+        "TIMEOUT_USER": "timeouted users",
+        "UNTIMEOUT_USER": "removed timeoutes",
+        "BAN_USER": "banned users",
+        "UNBAN_USER": "unbanned users",
+        "SLOW_ON": "enabled slow modus",
+        "SLOW_OFF": "disabled slow modus",
+        "EMOTES_ONLY_ON": "enabled emote only",
+        "EMOTES_ONLY_OFF": "disabled emote only",
+        "FOLLOWERS_ONLY_ON": "enabled follower only",
+        "FOLLOWERS_ONLY_OFF": "disabled follower only",
+        "SUBS_ONLY_ON": "enabled subs only",
+        "SUBS_ONLY_OFF": "disabled subs only",
+        "BLOCKED_TERM_ADD": "blacklisted words",
+        "BLOCKED_TERM_REMOVE": "removed blacklisted words",
+        "PERMITTED_TERM_ADD": "whitelisted words",
+        "PERMITTED_TERM_REMOVE": "removed whitelisted words",
+        "UNIQUE_ON": "enabled unique mode",
+        "UNIQUE_OFF": "disabled unique mode"
+    }
+}

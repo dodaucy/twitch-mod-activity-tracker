@@ -1,0 +1,22 @@
+# More languages can be added in the 'languages' folder.
+language: english
+twitch:
+  # Copy from chatterino or browser developer tools. If you make a change, please delete all files in the 'data' folder.
+  channel_id: "000000000"
+  # Copy from browser developer tools. The token of a secondary account should be used.
+  token: OAuth XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # Modern user agent (https://www.whatismybrowser.com/de/detect/what-is-my-user-agent)
+  user_agent: "Mozilla/5.0 (X11; Linux x86_64; rv:98.0) Gecko/20100101 Firefox/98.0"
+  # Time in seconds to wait between requests. Increase the time to make a ban less likely and decrease the time the more active the mods are. A maximum of 200 mod actions should be executed in the specified time.
+  pause_between_requests: 60
+discord:
+  # Discord bot token (https://discord.com/developers/applications)
+  token: XXXXXXXXXXXXXXXXXXXXXXXX.XXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXX
+  embed:
+    # Hide commands for other users
+    ephemeral: true
+    color:
+      # Embed color
+      normal: 0x89e322
+      # Embed error color
+      error: 0xFF0000

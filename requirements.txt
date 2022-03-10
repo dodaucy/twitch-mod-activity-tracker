@@ -1,0 +1,5 @@
+disnake
+requests
+pyyaml
+jsonc-parser
+munch
