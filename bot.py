@@ -72,6 +72,7 @@ async def top(
         color=config.discord.embed.color.normal
     )
     mods = get_actions(True)
+    # Sorts all moderators by most actions
     for place, (mod, actions) in enumerate(sorted(mods.items(), key=lambda x: sum(x[1].values()), reverse=True)):
         if place >= 5:
             break
@@ -105,6 +106,7 @@ async def list(
     mod_list = []
     if action is None:
         total_actions = 0
+        # Sorts all moderators by most actions
         for place, (mod, actions) in enumerate(sorted(get_actions(True).items(), key=lambda x: sum(x[1].values()), reverse=True)):
             for action in actions:
                 total_actions += actions[action]
@@ -119,6 +121,7 @@ async def list(
         )
     else:
         total_count = 0
+        # Sorts all moderators by most actions
         for place, (mod, count) in enumerate(sorted(get_actions()[get_action(action)].items(), key=lambda x: x[1], reverse=True)):
             total_count += count
             if place >= 50:

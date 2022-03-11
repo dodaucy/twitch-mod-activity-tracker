@@ -15,6 +15,7 @@ from config import data_path, language
 
 
 def get_actions(mod_format: bool = False) -> dict:
+    "Load all mod actions from a file"
     actions = {}
     with shelve.open(os.path.join(data_path, "actions")) as db:
         for action in db.keys():
@@ -29,24 +30,28 @@ def get_actions(mod_format: bool = False) -> dict:
 
 
 def put_actions(actions: dict) -> None:
+    "Saves mod actions to a file"
     with shelve.open(os.path.join(data_path, "actions")) as db:
         for key in actions:
             db[key] = actions[key]
 
 
 def get_command(command_display_name) -> str:
+    "Returns the original name of a command"
     for command in language.commands:
         if language.commands[command].display_name == command_display_name:
             return command
 
 
 def get_action(action_display_name) -> str:
+    "Returns the original name of a command action"
     for action in language.actions:
         if language.actions[action] == action_display_name:
             return action
 
 
 def command_help(command) -> str:
+    "Returns how a command should be used"
     description = f"**/{language.commands[command].display_name}**"
     if "arguments" in language.commands[command]:
         description += " "

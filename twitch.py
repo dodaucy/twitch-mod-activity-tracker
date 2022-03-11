@@ -21,6 +21,7 @@ from utils import get_actions, put_actions
 
 @loop(seconds=config.twitch.pause_between_requests)
 async def get_mod_actions():
+    # Download the latest 200 mod actions from Twitch
     body = REQUEST_BODY.copy()
     body['variables']['channelID'] = config.twitch.channel_id
     r = requests.post(
