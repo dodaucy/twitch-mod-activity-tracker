@@ -176,22 +176,24 @@ async def stats(
         )
 
 
-@bot.slash_command(
-    name=language.commands.about.display_name,
-    description=language.commands.about.description
-)
-async def about(
-    inter: disnake.ApplicationCommandInteraction,
-):
-    embed = disnake.Embed(
-        description="Visit on GitHub: https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker",
-        color=config.discord.embed.color.normal
+if config.discord.enable_about_command:
+
+    @bot.slash_command(
+        name=language.commands.about.display_name,
+        description=language.commands.about.description
     )
-    embed.set_author(
-        name="Copyright (C) 2022 X Gamer Guide",
-        url="https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker"
-    )
-    await inter.response.send_message(
-        embed=embed,
-        ephemeral=config.discord.embed.ephemeral
-    )
+    async def about(
+        inter: disnake.ApplicationCommandInteraction,
+    ):
+        embed = disnake.Embed(
+            description="Visit on GitHub: https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker",
+            color=config.discord.embed.color.normal
+        )
+        embed.set_author(
+            name="Copyright (C) 2022 X Gamer Guide",
+            url="https://github.com/X-Gamer-Guide/twitch-mod-activity-tracker"
+        )
+        await inter.response.send_message(
+            embed=embed,
+            ephemeral=config.discord.embed.ephemeral
+        )

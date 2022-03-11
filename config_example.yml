@@ -12,6 +12,8 @@ twitch:
 discord:
   # Discord bot token (https://discord.com/developers/applications)
   token: XXXXXXXXXXXXXXXXXXXXXXXX.XXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # Whether the /about command is enabled
+  enable_about_command: true
   embed:
     # Hide commands for other users
     ephemeral: true
