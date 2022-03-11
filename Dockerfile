@@ -18,7 +18,8 @@ RUN mkdir /config /data
 COPY config_example.yml /config/config.yml
 COPY languages /config/languages
 
-ENV RUN_IN_DOCKER TRUE
+ENV RUN_IN_DOCKER 1
+ENV PYTHONUNBUFFERED 1
 
 VOLUME ["/config"]
 VOLUME ["/data"]
