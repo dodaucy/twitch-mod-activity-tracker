@@ -37,7 +37,7 @@ async def get_mod_actions():
         return
     j = r.json()
     # * twitch duraction: j['extensions']['durationMilliseconds']
-    if j['data']['channel'] is None:
+    if j['data']['channel']['moderationLogs']['actions'] is None:
         print("no mod rights on this channel")
         return
     edges = j['data']['channel']['moderationLogs']['actions']['edges']
