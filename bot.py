@@ -150,6 +150,7 @@ async def stats(
         description=language.commands.stats.arguments.moderator.description
     )
 ):
+    moderator = moderator.lower()
     mods = get_actions(True)
     if moderator in mods:
         action_list = []
