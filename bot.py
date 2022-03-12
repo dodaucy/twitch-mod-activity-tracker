@@ -28,14 +28,14 @@ async def on_ready():
 
 
 @bot.slash_command(
-    name=language.commands.help.display_name,
+    name=language.commands.help.display_name.lower(),
     description=language.commands.help.description
 )
 async def help(
     inter: disnake.ApplicationCommandInteraction,
     command: Optional[str] = commands.Param(
         None,
-        name=language.commands.help.arguments.command.display_name,
+        name=language.commands.help.arguments.command.display_name.lower(),
         description=language.commands.help.arguments.command.description,
         choices=[language.commands[command].display_name for command in language.commands]
     )
@@ -61,7 +61,7 @@ async def help(
 
 
 @bot.slash_command(
-    name=language.commands.top.display_name,
+    name=language.commands.top.display_name.lower(),
     description=language.commands.top.description
 )
 async def top(
@@ -91,14 +91,14 @@ async def top(
 
 
 @bot.slash_command(
-    name=language.commands.list.display_name,
+    name=language.commands.list.display_name.lower(),
     description=language.commands.list.description
 )
 async def list(
     inter: disnake.ApplicationCommandInteraction,
     action: Optional[str] = commands.Param(
         None,
-        name=language.commands.list.arguments.action.display_name,
+        name=language.commands.list.arguments.action.display_name.lower(),
         description=language.commands.list.arguments.action.description,
         choices=[language.actions[action] for action in language.actions]
     )
@@ -132,7 +132,7 @@ async def list(
                 mod_list.append(f"**{place + 1}.** `{mod}`: {count}")
             description = "\n".join(mod_list)
             embed = disnake.Embed(
-                title=language.commands.list.embed.specialized.title.format(action=action),
+                title=language.commands.list.embed.specialized.title.format(total=total_count, action=action),
                 description=f"{language.commands.list.embed.specialized.total.format(total=total_count, action=action)}\n\n{description}",
                 color=config.discord.embed.color.normal
             )
@@ -149,13 +149,13 @@ async def list(
 
 
 @bot.slash_command(
-    name=language.commands.stats.display_name,
+    name=language.commands.stats.display_name.lower(),
     description=language.commands.stats.description
 )
 async def stats(
     inter: disnake.ApplicationCommandInteraction,
     moderator: str = commands.Param(
-        name=language.commands.stats.arguments.moderator.display_name,
+        name=language.commands.stats.arguments.moderator.display_name.lower(),
         description=language.commands.stats.arguments.moderator.description
     )
 ):
@@ -169,7 +169,7 @@ async def stats(
             action_list.append(f"{language.actions.get(action, action)}: **{mods[moderator][action]}**")
         description = "\n".join(action_list)
         embed = disnake.Embed(
-            title=language.commands.stats.embed.title.format(mod=moderator),
+            title=language.commands.stats.embed.title.format(total=total_actions, mod=moderator),
             description=f"{language.commands.stats.embed.total.format(total=total_actions, mod=moderator)}\n\n{description}",
             color=config.discord.embed.color.normal
         )
@@ -192,7 +192,7 @@ async def stats(
 if config.discord.enable_about_command:
 
     @bot.slash_command(
-        name=language.commands.about.display_name,
+        name=language.commands.about.display_name.lower(),
         description=language.commands.about.description
     )
     async def about(
