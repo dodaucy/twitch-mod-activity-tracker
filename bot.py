@@ -121,18 +121,27 @@ async def list(
         )
     else:
         total_count = 0
-        # Sorts all moderators by most actions
-        for place, (mod, count) in enumerate(sorted(get_actions()[get_action(action)].items(), key=lambda x: x[1], reverse=True)):
-            total_count += count
-            if place >= 50:
-                continue
-            mod_list.append(f"**{place + 1}.** `{mod}`: {count}")
-        description = "\n".join(mod_list)
-        embed = disnake.Embed(
-            title=language.commands.list.embed.specialized.title.format(action=action),
-            description=f"{language.commands.list.embed.specialized.total.format(total=total_count, action=action)}\n\n{description}",
-            color=config.discord.embed.color.normal
-        )
+        action = get_action(action)
+        actions = get_actions()
+        if action in actions:
+            # Sorts all moderators by most actions
+            for place, (mod, count) in enumerate(sorted(actions[action].items(), key=lambda x: x[1], reverse=True)):
+                total_count += count
+                if place >= 50:
+                    continue
+                mod_list.append(f"**{place + 1}.** `{mod}`: {count}")
+            description = "\n".join(mod_list)
+            embed = disnake.Embed(
+                title=language.commands.list.embed.specialized.title.format(action=action),
+                description=f"{language.commands.list.embed.specialized.total.format(total=total_count, action=action)}\n\n{description}",
+                color=config.discord.embed.color.normal
+            )
+        else:
+            embed = disnake.Embed(
+                title=language.commands.list.embed.specialized.title.format(action=action),
+                description=language.commands.list.embed.specialized.no_action,
+                color=config.discord.embed.color.error
+            )
     await inter.response.send_message(
         embed=embed,
         ephemeral=config.discord.embed.ephemeral

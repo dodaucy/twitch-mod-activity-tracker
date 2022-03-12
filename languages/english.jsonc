@@ -37,7 +37,8 @@
                 "total": "**{total}** mod actions in total",
                 "specialized": {
                     "title": "Top 50 mods the executed `{action}`",
-                    "total": "`{action}` was executed **{total}** times in total"
+                    "total": "`{action}` was executed **{total}** times in total",
+                    "no_action": "*This action was never executed*"
                 }
             }
         },
