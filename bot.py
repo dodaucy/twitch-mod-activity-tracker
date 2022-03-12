@@ -121,11 +121,11 @@ async def list(
         )
     else:
         total_count = 0
-        action = get_action(action)
+        original_action = get_action(action)
         actions = get_actions()
-        if action in actions:
+        if original_action in actions:
             # Sorts all moderators by most actions
-            for place, (mod, count) in enumerate(sorted(actions[action].items(), key=lambda x: x[1], reverse=True)):
+            for place, (mod, count) in enumerate(sorted(actions[original_action].items(), key=lambda x: x[1], reverse=True)):
                 total_count += count
                 if place >= 50:
                     continue
