@@ -1,4 +1,5 @@
 {
+    "no_data": "No data has been recorded yet",
     "required_optional_footer": "<> required | [] optional",
     "commands": {
         "help": {
@@ -38,7 +39,7 @@
                 "specialized": {
                     "title": "Top 50 mods the executed `{action}`",
                     "total": "`{action}` was executed **{total}** times in total",
-                    "no_action": "*This action was never executed*"
+                    "no_action": "This action was never executed"
                 }
             }
         },
