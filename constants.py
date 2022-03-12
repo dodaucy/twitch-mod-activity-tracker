@@ -23,3 +23,16 @@ REQUEST_BODY = {
         "order": "DESC"
     }
 }
+
+IGNORE_CHANNELS = [
+    "twitch"
+]
+
+IGNORE_ACTIONS = [
+    "MOD_USER",
+    "UNMOD_USER",
+    "VIP_USER",
+    "UNVIP_USER",
+    "RAID",
+    "HOST"
+]

@@ -68,10 +68,6 @@
         }
     },
     "actions": {
-        "MOD_USER": "Mods hinzugefügt",
-        "UNMOD_USER": "Mods entfernt",
-        "VIP_USER": "VIPs hinzugefügt",
-        "UNVIP_USER": "VIPs entfernt",
         "CHAT_CLEAR": "Chat geleert",
         "DELETE_MESSAGE": "Nachrichten gelöscht",
         "TIMEOUT_USER": "Benutzer getimeouted",
@@ -91,8 +87,6 @@
         "PERMITTED_TERM_ADD": "Wörter auf die Whitelist gesetzt",
         "PERMITTED_TERM_REMOVE": "Wörter von der Whitelist entfernt",
         "UNIQUE_ON": "Spamschutz aktiviert",
-        "UNIQUE_OFF": "Spamschutz deaktiviert",
-        "RAID": "Benutzer geraided",
-        "HOST": "Benutzer gehostet"
+        "UNIQUE_OFF": "Spamschutz deaktiviert"
     }
 }

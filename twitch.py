@@ -15,7 +15,7 @@ import requests
 from disnake.ext.tasks import loop
 
 from config import config, data_path
-from constants import GQL, REQUEST_BODY
+from constants import GQL, REQUEST_BODY, IGNORE_CHANNELS, IGNORE_ACTIONS
 from utils import get_actions, put_actions
 
 
@@ -54,7 +54,7 @@ async def get_mod_actions():
     for edge in edges:
         if edge['node']['id'] == last_id:
             break
-        if edge['node']['moderator']['login'] == "twitch":
+        if edge['node']['moderator']['login'] in IGNORE_CHANNELS or edge['node']['action'] in IGNORE_ACTIONS:
             continue
         if not edge['node']['action'] in actions:
             actions[edge['node']['action']] = {}
