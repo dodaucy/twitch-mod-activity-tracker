@@ -91,6 +91,8 @@
         "PERMITTED_TERM_ADD": "whitelisted words",
         "PERMITTED_TERM_REMOVE": "removed whitelisted words",
         "UNIQUE_ON": "enabled unique mode",
-        "UNIQUE_OFF": "disabled unique mode"
+        "UNIQUE_OFF": "disabled unique mode",
+        "RAID": "raided users",
+        "HOST": "hosted users"
     }
 }

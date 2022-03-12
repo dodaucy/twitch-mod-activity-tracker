@@ -91,6 +91,8 @@
         "PERMITTED_TERM_ADD": "Wörter auf die Whitelist gesetzt",
         "PERMITTED_TERM_REMOVE": "Wörter von der Whitelist entfernt",
         "UNIQUE_ON": "Spamschutz aktiviert",
-        "UNIQUE_OFF": "Spamschutz deaktiviert"
+        "UNIQUE_OFF": "Spamschutz deaktiviert",
+        "RAID": "Benutzer geraided",
+        "HOST": "Benutzer gehostet"
     }
 }
