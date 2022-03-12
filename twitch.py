@@ -60,6 +60,9 @@ async def get_mod_actions():
             break
         if edge['node']['moderator']['login'] in IGNORE_CHANNELS or edge['node']['action'] in IGNORE_ACTIONS:
             continue
+        if config.twitch.ignore_broadcaster:
+            if edge['node']['moderator']['id'] == config.twitch.channel_id:
+                continue
         if not edge['node']['action'] in actions:
             actions[edge['node']['action']] = {}
         if not edge['node']['moderator']['login'] in actions[edge['node']['action']]:
