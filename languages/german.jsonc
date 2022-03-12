@@ -6,7 +6,7 @@
             "description": "Zeigt eine Liste von Befehlen an",
             "arguments": {
                 "command": {
-                    "display_name": "Befehl",
+                    "display_name": "befehl",
                     "description": "Der Befehl für den die Informationen angezeigt werden sollen",
                     "marked_as_optional": true  // do not edit
                 }
@@ -27,7 +27,7 @@
             "description": "Zeigt eine Liste der aktivsten Mods an",
             "arguments": {
                 "action": {
-                    "display_name": "Aktion",
+                    "display_name": "aktion",
                     "description": "Aktion für die die aktivsten Mods angezeigt werden sollen",
                     "marked_as_optional": true  // do not edit
                 }
@@ -47,7 +47,7 @@
             "description": "Zeigt Statistiken über einen bestimmten Mod an",
             "arguments": {
                 "moderator": {
-                    "display_name": "Moderator",
+                    "display_name": "moderator",
                     "description": "Der Twitch Benutzername eines Moderators",
                     "marked_as_optional": false  // do not edit
                 }
