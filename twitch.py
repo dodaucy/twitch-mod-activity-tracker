@@ -32,16 +32,20 @@ async def get_mod_actions():
         },
         json=body
     )
-    if not r.status_code == 200:
-        print(f"twitch [{r.status_code}]: {r.text}")
+    try:
+        j = r.json()
+    except requests.exceptions.JSONDecodeError:
+        print(r.text)
         return
-    j = r.json()
+    if "error" in j:
+        print(f"Twitch [{j['error']}]: {j['message']}")
+        return
     # * twitch duraction: j['extensions']['durationMilliseconds']
     if j['data']['channel'] is None:
-        print("channel not found")
+        print("Channel not found")
         return
     if j['data']['channel']['moderationLogs']['actions'] is None:
-        print("no mod rights on this channel")
+        print("No mod rights on this channel")
         return
     edges = j['data']['channel']['moderationLogs']['actions']['edges']
     with shelve.open(os.path.join(data_path, "last_ids")) as db:
