@@ -9,9 +9,13 @@
 
 
 import time
+import logging
 import uuid
 
 from fastapi import status
+
+
+log = logging.getLogger(__name__)
 
 
 class AuthError(Exception):
@@ -25,19 +29,21 @@ class Auth:
     def __init__(self):
         self.states = []
 
-    def add(self):
+    def add(self) -> str:
         state = uuid.uuid4().hex
+        log.debug(f"Create state ({state})")
         self.states.append({
             "expire": time.time() + 3600,
             "state": state
         })
         return state
 
-    def validade(self, state):
+    def validade(self, state) -> None:
         for index, entry in enumerate(self.states):
             if entry['state'] == state:
                 if entry['expire'] > time.time():
                     self.states.pop(index)
+                    log.debug(f"State {state} is valid")
                     return
         raise AuthError(
             "Invalid state",
@@ -49,3 +55,4 @@ class Auth:
         for index, entry in enumerate(self.states):
             if entry['expire'] < time.time():
                 self.states.pop(index)
+                log.debug(f"Expired state ({entry['state']}) removed")

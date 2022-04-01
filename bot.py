@@ -9,22 +9,23 @@
 
 
 from typing import Optional
+import logging
 
 import disnake
 from disnake.ext import commands
 
 from config import config, language
-from twitch import get_mod_actions
 from utils import command_help, get_action, get_actions, get_command
 
+
+log = logging.getLogger(__name__)
 
 bot = commands.Bot(sync_commands=True)
 
 
 @bot.event
 async def on_ready():
-    get_mod_actions.start()
-    print("Online")
+    log.info("Discord bot online")
 
 
 @bot.slash_command(

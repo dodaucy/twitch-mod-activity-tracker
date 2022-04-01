@@ -8,6 +8,11 @@
 ##################################################################
 
 
+# ! oudated
+# ! do not import
+# ! oudated
+
+
 import os
 import shelve
 
@@ -16,7 +21,7 @@ from disnake.ext.tasks import loop
 
 from config import config, data_path
 from constants import GQL, REQUEST_BODY, IGNORE_CHANNELS, IGNORE_ACTIONS
-from utils import get_actions, put_actions
+from utils import get_actions, put_actions, check_for_errors
 
 
 @loop(seconds=config.twitch.pause_between_requests)
@@ -32,21 +37,16 @@ async def get_mod_actions():
         },
         json=body
     )
-    try:
-        j = r.json()
-    except requests.exceptions.JSONDecodeError:
-        print(r.text)
+    j = check_for_errors(r)
+    if j is None:
         return
-    if "error" in j:
-        print(f"Twitch [{j['error']}]: {j['message']}")
+    elif j['data']['channel'] is None:
+        print("Twitch: Channel not found")
+        return
+    elif j['data']['channel']['moderationLogs']['actions'] is None:
+        print("Twitch: No mod rights on this channel")
         return
     # * twitch duraction: j['extensions']['durationMilliseconds']
-    if j['data']['channel'] is None:
-        print("Channel not found")
-        return
-    if j['data']['channel']['moderationLogs']['actions'] is None:
-        print("No mod rights on this channel")
-        return
     edges = j['data']['channel']['moderationLogs']['actions']['edges']
     with shelve.open(os.path.join(data_path, "last_ids")) as db:
         if config.twitch.channel_id in db:

@@ -8,31 +8,42 @@
 ##################################################################
 
 
-GQL = "https://gql.twitch.tv/gql"
+SCOPE = "channel:moderate"  # https://dev.twitch.tv/docs/pubsub#available-topics
 
-REQUEST_BODY = {
-    "extensions": {
-        "persistedQuery": {
-            "sha256Hash": "ce67ed3b519c6452da82a42f27d9874a22d9c60d140209fc14698778fd6b1769",
-            "version": 1
-        },
-        "operationName": "ModActionsCtx_GetModerationActions"
-    },
-    "variables": {
-        "first": 200,
-        "order": "DESC"
-    }
-}
+PUBSUB = "wss://pubsub-edge.twitch.tv"
 
-IGNORE_CHANNELS = [
-    "twitch"
-]
+USER_AGENT = "Twitch Mod Activity Tracker"
 
-IGNORE_ACTIONS = [
-    "MOD_USER",
-    "UNMOD_USER",
-    "VIP_USER",
-    "UNVIP_USER",
-    "RAID",
-    "HOST"
+# ! oudated
+# IGNORE_CHANNELS = [
+#     "twitch"
+# ]
+
+# ! oudated
+# IGNORE_ACTIONS = [
+#     "MOD_USER",
+#     "UNMOD_USER",
+#     "VIP_USER",
+#     "UNVIP_USER",
+#     "RAID",
+#     "HOST"
+# ]
+
+ACTIONS = [
+    "clear",
+    "delete",
+    "timeout",
+    "untimeout",
+    "ban",
+    "unban",
+    "slow",
+    "slowoff",
+    "emoteonly",
+    "emoteonlyoff",
+    "followers",
+    "followersoff",
+    "subscribers",
+    "subscribersoff",
+    "r9kbeta",
+    "r9kbetaoff"
 ]

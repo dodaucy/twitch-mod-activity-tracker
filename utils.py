@@ -9,11 +9,28 @@
 
 
 import os
+import logging
+import time
 import shelve
+from urllib.parse import quote_plus
+from typing import Optional
 
-from config import data_path, language
+import requests
+
+from config import config, language
+from constants import USER_AGENT
+from cursor import Cursor
 
 
+log = logging.getLogger(__name__)
+
+
+class TwitchError:
+    def __init__(self):
+        pass
+
+
+# ! oudated
 def get_actions(mod_format: bool = False) -> dict:
     "Load all mod actions from a file"
     actions = {}
@@ -29,6 +46,7 @@ def get_actions(mod_format: bool = False) -> dict:
     return actions
 
 
+# ! oudated
 def put_actions(actions: dict) -> None:
     "Saves mod actions to a file"
     with shelve.open(os.path.join(data_path, "actions")) as db:
@@ -36,21 +54,52 @@ def put_actions(actions: dict) -> None:
             db[key] = actions[key]
 
 
-def get_command(command_display_name) -> str:
+def refresh_token(token: str, refresh_token: str, expires: float) -> None:
+    log.debug("Refresh token...")
+    t = time.time()
+    if expires < t:
+        log.debug("Token invalid")
+        with Cursor() as c:
+            c.execute(
+                "DELETE FROM mods WHERE token = %s;",
+                (
+                    token,
+                )
+            )
+    elif expires - t < 1800:
+        log.debug(f"Token expires in {expires - t} seconds. Refresh...")
+        ...  # ! if not authorized delete the token
+        log.debug("Refreshed")
+    else:
+        log.debug(f"Token valid. Expires in {expires - t} seconds")
+
+
+def refresh_all_tokens() -> None:
+    with Cursor() as c:
+        c.execute(
+            "SELECT * FROM mods;"
+        )
+        mods = c.fetchall()
+    for mod in mods:
+        refresh_token(mod['token'], mod['refresh_token'], mod['expires'])
+
+
+
+def get_command(command_display_name: str) -> str:
     "Returns the original name of a command"
     for command in language.commands:
         if language.commands[command].display_name == command_display_name:
             return command
 
 
-def get_action(action_display_name) -> str:
+def get_action(action_display_name: str) -> str:
     "Returns the original name of a command action"
     for action in language.actions:
         if language.actions[action] == action_display_name:
             return action
 
 
-def command_help(command) -> str:
+def command_help(command: str) -> str:
     "Returns how a command should be used"
     description = f"**/{language.commands[command].display_name}**"
     if "arguments" in language.commands[command]:
@@ -61,3 +110,27 @@ def command_help(command) -> str:
             else:
                 description += f"**<** `{language.commands[command].arguments[argument].display_name}` **>**"
     return description
+
+
+def raise_on_error(
+    response: requests.Response,
+    ignore_message: Optional[str] = None
+) -> dict:
+    j = response.json()
+    if "message" in j:
+        if ignore_message is not None:
+            if j['message'] == ignore_message:
+                return j
+        raise Exception(f"{j['error'] if 'error' in j else 'UNKNOW'} / {j['message']}")
+    elif response.status_code != 200:
+        raise Exception(f"{response.status_code} / {j}")
+    return j
+
+
+def join_args(url: str, *args, **kwargs) -> str:
+    if not args and not kwargs:
+        return url
+    args = [quote_plus(arg) for arg in args]
+    for kwarg in kwargs:
+        args.append(f"{kwarg}={quote_plus(kwargs[kwarg])}")
+    return f'{url}?{"&".join(args)}'
