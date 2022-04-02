@@ -19,14 +19,14 @@ from disnake.ext import tasks
 from api import app, authentication
 from bot import bot
 from config import config
+from pubsub import PubSub
 from utils import refresh_all_tokens
-import pubsub
 
 
 # Enable logging
 coloredlogs.install(
     level=logging.DEBUG,
-    fmt="[%(asctime)s] [%(threadName)s/%(levelname)s] [%(name)s.%(funcName)s:%(lineno)s]: %(message)s",
+    fmt="[%(asctime)s] [%(threadName)s/%(levelname)s] [%(name)s.%(funcName)s:%(lineno)s]: %(message)s",  # TODO: configurable
     isatty=sys.stderr.isatty()
 )
 
@@ -89,6 +89,7 @@ threading.Thread(
 
 # Start pubsub
 log.debug("Start pubsub...")
+pubsub = PubSub()
 threading.Thread(
     target=pubsub.run,
     daemon=True
