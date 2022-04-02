@@ -30,21 +30,26 @@ class Auth:
         self.states = []
 
     def add(self) -> str:
+        "Create a random string and store it in a list"
+
         state = uuid.uuid4().hex
-        log.debug(f"Create state ({state})")
+        log.debug(f"Create state: {state}")
         self.states.append({
-            "expire": time.time() + 3600,
+            "expire": time.time() + 3600,  # TODO: configurable
             "state": state
         })
         return state
 
-    def validade(self, state) -> None:
-        for index, entry in enumerate(self.states):
+    def validade(self, state: str) -> None:
+        "Checks whether the specified string is valid"
+
+        for entry in list(self.states):
             if entry['state'] == state:
                 if entry['expire'] > time.time():
-                    self.states.pop(index)
-                    log.debug(f"State {state} is valid")
+                    self.states.remove(entry)
+                    log.debug(f"State is valid: {state}")
                     return
+        log.debug(f"State {state} in invalid")
         raise AuthError(
             "Invalid state",
             "Please repeat the authentication",
@@ -52,7 +57,9 @@ class Auth:
         )
 
     def remove_expired_states(self) -> None:
-        for index, entry in enumerate(self.states):
+        "Removes all invalid data"
+
+        for entry in list(self.states):
             if entry['expire'] < time.time():
-                self.states.pop(index)
-                log.debug(f"Expired state ({entry['state']}) removed")
+                self.states.remove(entry)
+                log.debug(f"Expired state removed: {entry['state']}")
