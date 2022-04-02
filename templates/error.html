@@ -1,12 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{title}}</title>
+        <style>
+            html {
+                color-scheme: light dark;
+            }
+            body {
+                text-align: center;
+                font-family: system-ui;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        </style>
     </head>
     <body>
-        <div style="text-align: center; color: red;">
+        <h1>
             <h1>
                 {{title}}
             </h1>
@@ -16,6 +29,6 @@
             <h3>
                 <a href="/auth">Reverify</a>
             </h3>
-        </div>
+        </h1>
     </body>
 </html>
