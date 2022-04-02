@@ -18,7 +18,6 @@ from starlette.responses import RedirectResponse
 
 from auth import Auth, AuthError
 from cursor import Cursor
-from broadcaster import Broadcaster
 from config import config
 from constants import SCOPE, USER_AGENT
 from utils import join_args, raise_on_error
@@ -33,6 +32,7 @@ app = FastAPI(
 )
 
 session = requests.Session()
+session.headers = {"User-Agent": USER_AGENT}
 
 authentication = Auth()
 
@@ -69,14 +69,13 @@ async def index(request: Request):
 
 @app.get("/auth")
 async def auth():
-    state = authentication.add()
     return RedirectResponse(join_args(
-        "https://id.twitch.tv/oauth2/authorize",
+        "https://id.twitch.tv/oauth2/authorize",  # TODO: in constants.py
         client_id=config.twitch.client_id,
         redirect_uri=config.twitch.redirect_uri,
         response_type="code",
         scope=SCOPE,
-        state=state
+        state=authentication.add()
     ))
 
 
@@ -94,12 +93,9 @@ async def verify(
             "Please repeat the authentication",
             status.HTTP_400_BAD_REQUEST
         )
-    log.debug("Verify a mod...")
+    log.debug(f"Verify a mod ({state})...")
     r = session.post(
-        "https://id.twitch.tv/oauth2/token",
-        headers={
-            "USer-Agent": USER_AGENT
-        },
+        "https://id.twitch.tv/oauth2/token",  # TODO: in constants.py
         params={
             "client_id": config.twitch.client_id,
             "client_secret": config.twitch.client_secret,
@@ -112,7 +108,7 @@ async def verify(
     token = j['access_token']
     refresh_token = j['refresh_token']
     r = session.get(
-        "https://id.twitch.tv/oauth2/validate",
+        "https://id.twitch.tv/oauth2/validate",  # TODO: in constants.py
         headers={
             "Authorization": f"Bearer {token}"
         }
@@ -145,7 +141,7 @@ async def verify(
                 time.time() + j['expires_in']
             )
         )
-    log.info(f"Verified {j['login']} ({j['user_id']})")
+    log.info(f"Verified {j['login']} ({j['user_id']} / {state})")
     return templates.TemplateResponse(
         "successful.html",
         {
