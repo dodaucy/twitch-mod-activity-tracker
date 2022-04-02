@@ -54,11 +54,12 @@ def put_actions(actions: dict) -> None:
             db[key] = actions[key]
 
 
-def refresh_token(token: str, refresh_token: str, expires: float) -> None:
+# ! oudated
+def refresh_token(mod_id: str, token: str, refresh_token: str, expires: float) -> None:
     log.debug("Refresh token...")
     t = time.time()
     if expires < t:
-        log.debug("Token invalid")
+        log.info(f"Token from {mod_id} expired")
         with Cursor() as c:
             c.execute(
                 "DELETE FROM mods WHERE token = %s;",
@@ -67,11 +68,11 @@ def refresh_token(token: str, refresh_token: str, expires: float) -> None:
                 )
             )
     elif expires - t < 1800:
-        log.debug(f"Token expires in {expires - t} seconds. Refresh...")
+        log.debug(f"Token from {mod_id} expires in {expires - t} seconds. Refresh...")
         ...  # ! if not authorized delete the token
-        log.debug("Refreshed")
+        log.debug(f"Token from {mod_id} refreshed")
     else:
-        log.debug(f"Token valid. Expires in {expires - t} seconds")
+        log.debug(f"Token from {mod_id} valid. Expires in {expires - t} seconds")
 
 
 def refresh_all_tokens() -> None:
@@ -81,8 +82,23 @@ def refresh_all_tokens() -> None:
         )
         mods = c.fetchall()
     for mod in mods:
-        refresh_token(mod['token'], mod['refresh_token'], mod['expires'])
-
+        log.debug("Refresh token...")
+        t = time.time()
+        if mod['expires'] < t:
+            log.info(f"Token from {mod['id']} expired")
+            with Cursor() as c:
+                c.execute(
+                    "DELETE FROM mods WHERE token = %s;",
+                    (
+                        mod['token'],
+                    )
+                )
+        elif mod['expires'] - t < 1800:
+            log.debug(f"Token from {mod['id']} expires in {mod['expires'] - t} seconds. Refresh...")
+            ...  # ! if not authorized delete the token / mod['refresh_token']
+            log.debug(f"Token from {mod['id']} refreshed")
+        else:
+            log.debug(f"Token from {mod['id']} valid. Expires in {mod['expires'] - t} seconds")
 
 
 def get_command(command_display_name: str) -> str:
