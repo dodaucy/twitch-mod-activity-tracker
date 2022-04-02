@@ -27,11 +27,21 @@ else:
     config_path = "."
 
 
-# Read config from file
+# Read config from file and concert to better object
+log.debug("Load config")
 with open(os.path.join(config_path, "config.yml"), "r") as f:
-    log.debug("Load config")
     config = munchify(yaml.safe_load(f))
-
-# Concert config to better object
-language = munchify(JsoncParser.parse_file(os.path.join(config_path, "languages", f"{config.language}.jsonc")))
 log.debug("Loaded config")
+
+
+# Load languages
+log.debug("Load languages")
+language = munchify(
+    JsoncParser.parse_file(
+        os.path.join(
+            config_path, "languages",
+            f"{config.language}.jsonc"
+        )
+    )
+)
+log.debug("Languages loaded")
