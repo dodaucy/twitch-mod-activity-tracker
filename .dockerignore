@@ -1,13 +1,17 @@
+# cache
 __pycache__
 
+# git
 .git
 .gitignore
 
+# Docker
 .dockerignore
 Dockerfile
 
-data
+# config
 config.yml
 
+# README
 img
 README.md
