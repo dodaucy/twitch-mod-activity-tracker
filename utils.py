@@ -25,11 +25,6 @@ from cursor import Cursor
 log = logging.getLogger(__name__)
 
 
-class TwitchError:
-    def __init__(self):
-        pass
-
-
 # ! oudated
 def get_actions(mod_format: bool = False) -> dict:
     "Load all mod actions from a file"
@@ -44,35 +39,6 @@ def get_actions(mod_format: bool = False) -> dict:
             else:
                 actions[action] = db[action]
     return actions
-
-
-# ! oudated
-def put_actions(actions: dict) -> None:
-    "Saves mod actions to a file"
-    with shelve.open(os.path.join(data_path, "actions")) as db:
-        for key in actions:
-            db[key] = actions[key]
-
-
-# ! oudated
-def refresh_token(mod_id: str, token: str, refresh_token: str, expires: float) -> None:
-    log.debug("Refresh token...")
-    t = time.time()
-    if expires < t:
-        log.info(f"Token from {mod_id} expired")
-        with Cursor() as c:
-            c.execute(
-                "DELETE FROM mods WHERE token = %s;",
-                (
-                    token,
-                )
-            )
-    elif expires - t < 1800:
-        log.debug(f"Token from {mod_id} expires in {expires - t} seconds. Refresh...")
-        ...  # ! if not authorized delete the token
-        log.debug(f"Token from {mod_id} refreshed")
-    else:
-        log.debug(f"Token from {mod_id} valid. Expires in {expires - t} seconds")
 
 
 def refresh_all_tokens() -> None:
