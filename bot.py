@@ -135,7 +135,6 @@ async def list(
         else:
             mod_list = []
             total_actions = 0
-            # Sorts all moderators by most actions
             for place, mod in enumerate(mods):
                 actions = 0
                 for action in ACTIONS:
@@ -152,15 +151,29 @@ async def list(
     else:
         mod_list = []
         total_count = 0
-        original_action = get_action(action)
-        actions = get_actions()
-        if original_action in actions:
-            # Sorts all moderators by most actions
-            for place, (mod, count) in enumerate(sorted(actions[original_action].items(), key=lambda x: x[1], reverse=True)):
-                total_count += count
+        for translated_action in language.actions:
+            if language.actions[translated_action] == action:
+                break
+        with Cursor() as c:
+            c.execute(
+                f"SELECT * FROM actions ORDER BY `{translated_action}` DESC"
+            )
+            mods = c.fetchall()
+        actions = {}
+        for mod in mods:
+            for raw_action in ACTIONS:
+                if mod[raw_action] > 0:
+                    if raw_action not in actions:
+                        actions[raw_action] = {}
+                    actions[raw_action][mod['mod_id']] = mod[raw_action]
+        if translated_action in actions:
+            for place, mod in enumerate(mods):
+                if mod[translated_action] == 0:
+                    break
+                total_count += mod[translated_action]
                 if place >= 50:
                     continue
-                mod_list.append(f"**{place + 1}.** `{mod}`: {count}")
+                mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {mod[translated_action]}")
             description = "\n".join(mod_list)
             embed = disnake.Embed(
                 title=language.commands.list.embed.specialized.title.format(total=total_count, action=action),
