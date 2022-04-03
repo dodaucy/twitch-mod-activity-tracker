@@ -49,7 +49,7 @@ class Auth:
                     self.states.remove(entry)
                     log.debug(f"State is valid: {state}")
                     return
-        log.debug(f"State {state} in invalid")
+        log.debug(f"State {state} invalid")
         raise AuthError(
             "Invalid state",
             "Please repeat the authentication",
