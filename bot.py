@@ -8,14 +8,16 @@
 ##################################################################
 
 
-from typing import Optional
 import logging
+from typing import Optional
 
 import disnake
 from disnake.ext import commands
 
 from config import config, language
-from utils import command_help, get_action, get_actions, get_command
+from constants import ACTIONS
+from cursor import Cursor
+from utils import command_help, get_action, get_command
 
 
 log = logging.getLogger(__name__)
@@ -68,8 +70,12 @@ async def help(
 async def top(
     inter: disnake.ApplicationCommandInteraction
 ):
-    mods = get_actions(True)
-    if mods == {}:
+    with Cursor() as c:
+        c.execute(
+            f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in ACTIONS])} DESC LIMIT 5"
+        )
+        mods = c.fetchall()
+    if mods == []:
         embed = disnake.Embed(
             title=language.commands.top.embed.title,
             description=language.no_data,
@@ -80,15 +86,13 @@ async def top(
             title=language.commands.top.embed.title,
             color=config.discord.embed.color.normal
         )
-        # Sorts all moderators by most actions
-        for place, (mod, actions) in enumerate(sorted(mods.items(), key=lambda x: sum(x[1].values()), reverse=True)):
-            if place >= 5:
-                break
+        for place, mod in enumerate(mods):
             action_list = []
-            for action in sorted(mods[mod], key=lambda x: mods[mod][x], reverse=True):
-                action_list.append(f"{language.actions.get(action, action)}: **{actions[action]}**")
+            for action in sorted(ACTIONS, key=lambda x: mod[x], reverse=True):
+                if mod[action] > 0:
+                    action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
             embed.add_field(
-                name=f"{place + 1}. {mod} | `{sum(actions.values())}`",
+                name=f"{place + 1}. {mod['display_name']} | `{sum([mod[action] for action in ACTIONS])}`",
                 value="\n".join(action_list),
                 inline=False
             )
