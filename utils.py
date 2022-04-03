@@ -8,43 +8,26 @@
 ##################################################################
 
 
-import os
 import logging
 import time
-import shelve
-from urllib.parse import quote_plus
 from typing import Optional
+from urllib.parse import quote_plus
 
 import requests
 
 from config import config, language
-from constants import USER_AGENT
 from cursor import Cursor
 
 
 log = logging.getLogger(__name__)
 
-
-# ! oudated
-def get_actions(mod_format: bool = False) -> dict:
-    "Load all mod actions from a file"
-    actions = {}
-    with shelve.open(os.path.join(data_path, "actions")) as db:
-        for action in db.keys():
-            if mod_format:
-                for mod in db[action]:
-                    if mod not in actions:
-                        actions[mod] = {}
-                    actions[mod][action] = db[action][mod]
-            else:
-                actions[action] = db[action]
-    return actions
+session = requests.session()
 
 
 def refresh_all_tokens() -> None:
     with Cursor() as c:
         c.execute(
-            "SELECT * FROM mods;"
+            "SELECT * FROM mods"
         )
         mods = c.fetchall()
     for mod in mods:
@@ -54,15 +37,43 @@ def refresh_all_tokens() -> None:
             log.info(f"Token from {mod['id']} expired")
             with Cursor() as c:
                 c.execute(
-                    "DELETE FROM mods WHERE token = %s;",
+                    "DELETE FROM mods WHERE token = %s",
                     (
                         mod['token'],
                     )
                 )
         elif mod['expires'] - t < 1800:
             log.debug(f"Token from {mod['id']} expires in {mod['expires'] - t} seconds. Refresh...")
-            ...  # ! if not authorized delete the token / mod['refresh_token']
-            log.debug(f"Token from {mod['id']} refreshed")
+            r = session.post(
+                "https://id.twitch.tv/oauth2/token",  # TODO: in constants.py
+                params={
+                    "grant_type": "refresh_token",
+                    "refresh_token": mod['refresh_token'],
+                    "client_id": config.twitch.client_id,
+                    "client_secret": config.twitch.client_secret
+                }
+            )
+            j = raise_on_error(r, "Invalid refresh token")
+            with Cursor() as c:
+                if "message" in j:
+                    c.execute(
+                        "DELETE FROM mods WHERE id = %s",
+                        (
+                            mod['id'],
+                        )
+                    )
+                    log.debug(f"Token from {mod['id']} is invalid")
+                else:
+                    c.execute(
+                        "UPDATE mods SET token = %s, refresh_token = %s, expires = %s WHERE id = %s",
+                        (
+                            j['access_token'],
+                            j['refresh_token'],
+                            time.time() + j['expires_in'],
+                            mod['id']
+                        )
+                    )
+                    log.debug(f"Token from {mod['id']} refreshed")
         else:
             log.debug(f"Token from {mod['id']} valid. Expires in {mod['expires'] - t} seconds")
 
@@ -72,13 +83,6 @@ def get_command(command_display_name: str) -> str:
     for command in language.commands:
         if language.commands[command].display_name == command_display_name:
             return command
-
-
-def get_action(action_display_name: str) -> str:
-    "Returns the original name of a command action"
-    for action in language.actions:
-        if language.actions[action] == action_display_name:
-            return action
 
 
 def command_help(command: str) -> str:
