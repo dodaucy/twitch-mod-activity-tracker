@@ -17,7 +17,7 @@ from disnake.ext import commands
 from config import config, language
 from constants import ACTIONS
 from cursor import Cursor
-from utils import command_help, get_action, get_command
+from utils import command_help, get_command
 
 
 log = logging.getLogger(__name__)
@@ -76,6 +76,7 @@ async def top(
         )
         mods = c.fetchall()
     if mods == []:
+        # No data
         embed = disnake.Embed(
             title=language.commands.top.embed.title,
             description=language.no_data,
@@ -88,11 +89,14 @@ async def top(
         )
         for place, mod in enumerate(mods):
             action_list = []
+            actions = 0
+            # Sort actions
             for action in sorted(ACTIONS, key=lambda x: mod[x], reverse=True):
                 if mod[action] > 0:
+                    actions += mod[action]
                     action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
             embed.add_field(
-                name=f"{place + 1}. {mod['display_name']} | `{sum([mod[action] for action in ACTIONS])}`",
+                name=f"{place + 1}. {mod['display_name']} | `{actions}`",
                 value="\n".join(action_list),
                 inline=False
             )
@@ -115,24 +119,30 @@ async def list(
         choices=[language.actions[action] for action in language.actions]
     )
 ):
-    mod_list = []
     if action is None:
-        total_actions = 0
-        mods = get_actions(True)
-        if mods == {}:
+        with Cursor() as c:
+            c.execute(
+                f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in ACTIONS])} DESC"
+            )
+            mods = c.fetchall()
+        if mods == []:
+            # No data
             embed = disnake.Embed(
                 title=language.commands.top.embed.title,
                 description=language.no_data,
                 color=config.discord.embed.color.error
             )
         else:
+            mod_list = []
+            total_actions = 0
             # Sorts all moderators by most actions
-            for place, (mod, actions) in enumerate(sorted(mods.items(), key=lambda x: sum(x[1].values()), reverse=True)):
-                for action in actions:
-                    total_actions += actions[action]
-                if place >= 50:
-                    continue
-                mod_list.append(f"**{place + 1}.** `{mod}`: {sum(actions.values())}")
+            for place, mod in enumerate(mods):
+                actions = 0
+                for action in ACTIONS:
+                    total_actions += mod[action]
+                    actions += mod[action]
+                if place <= 50:
+                    mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {actions}")
             description = "\n".join(mod_list)
             embed = disnake.Embed(
                 title=language.commands.list.embed.title,
@@ -140,6 +150,7 @@ async def list(
                 color=config.discord.embed.color.normal
             )
     else:
+        mod_list = []
         total_count = 0
         original_action = get_action(action)
         actions = get_actions()
