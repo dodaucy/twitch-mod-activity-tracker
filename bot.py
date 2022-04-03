@@ -203,29 +203,37 @@ async def stats(
         description=language.commands.stats.arguments.moderator.description
     )
 ):
-    moderator = moderator.lower()
-    mods = get_actions(True)
-    if moderator in mods:
-        action_list = []
-        total_actions = 0
-        for action in sorted(mods[moderator], key=lambda x: mods[moderator][x], reverse=True):
-            total_actions += mods[moderator][action]
-            action_list.append(f"{language.actions.get(action, action)}: **{mods[moderator][action]}**")
-        description = "\n".join(action_list)
+    with Cursor() as c:
+        c.execute(
+            "SELECT * FROM actions WHERE mod_id = %s OR display_name = %s",
+            (
+                moderator.lower(),
+                moderator.lower()
+            )
+        )
+        mod = c.fetchone()
+    if mod is None:
         embed = disnake.Embed(
-            title=language.commands.stats.embed.title.format(total=total_actions, mod=moderator),
-            description=f"{language.commands.stats.embed.total.format(total=total_actions, mod=moderator)}\n\n{description}",
-            color=config.discord.embed.color.normal
+            title=language.commands.stats.embed.mod_not_found.title,
+            description=language.commands.stats.embed.mod_not_found.description.format(mod=moderator),
+            color=config.discord.embed.color.error
         )
         await inter.response.send_message(
             embed=embed,
             ephemeral=config.discord.embed.ephemeral
         )
     else:
+        action_list = []
+        total_actions = 0
+        for action in sorted(ACTIONS, key=lambda x: mod[x], reverse=True):
+            if mod[action] > 0:
+                total_actions += mod[action]
+                action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
+        description = "\n".join(action_list)
         embed = disnake.Embed(
-            title=language.commands.stats.embed.mod_not_found.title,
-            description=language.commands.stats.embed.mod_not_found.description.format(mod=moderator),
-            color=config.discord.embed.color.error
+            title=language.commands.stats.embed.title.format(total=total_actions, mod=mod['display_name']),
+            description=f"{language.commands.stats.embed.total.format(total=total_actions, mod=mod['display_name'])}\n\n{description}",
+            color=config.discord.embed.color.normal
         )
         await inter.response.send_message(
             embed=embed,
