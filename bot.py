@@ -15,9 +15,9 @@ import disnake
 from disnake.ext import commands
 
 from config import config, language
-from constants import ACTIONS
+from constants import ARGUMENTS_REQUIRED, LANGUAGE_STRUCTURE
 from cursor import Cursor
-from utils import command_help, get_command
+from utils import get_command
 
 
 log = logging.getLogger(__name__)
@@ -31,29 +31,49 @@ async def on_ready():
 
 
 @bot.slash_command(
-    name=language.commands.help.display_name.lower(),
+    name=language.commands.help.display_name,
     description=language.commands.help.description
 )
 async def help(
     inter: disnake.ApplicationCommandInteraction,
     command: Optional[str] = commands.Param(
         None,
-        name=language.commands.help.arguments.command.display_name.lower(),
+        name=language.commands.help.arguments.command.display_name,
         description=language.commands.help.arguments.command.description,
-        choices=[language.commands[command].display_name for command in language.commands]
+        choices=[language.commands[command].display_name for command in LANGUAGE_STRUCTURE['commands']]
     )
 ):
+
     if command is None:
+        description = ""
+        for command in LANGUAGE_STRUCTURE['commands']:
+            description += f"\n**/{language.commands[command].display_name}**"
+            if "arguments" in LANGUAGE_STRUCTURE['commands'][command]:
+                for argument in LANGUAGE_STRUCTURE['commands'][command]['arguments']:
+                    if ARGUMENTS_REQUIRED[command][argument]:
+                        description += f" **<** `{language.commands[command].arguments[argument].display_name}` **>**"
+                    else:
+                        description += f" **[** `{language.commands[command].arguments[argument].display_name}` **]**"
+            description += f"\n{language.commands[command].description}"
         embed = disnake.Embed(
             title=language.commands.help.embed.title,
-            description="\n".join([f"{command_help(command)}\n{language.commands[command].description}" for command in language.commands]),
+            description=description,
             color=config.discord.embed.color.normal
         )
     else:
-        command = get_command(command)
+        for cmd in LANGUAGE_STRUCTURE['commands']:
+            if language.commands[cmd].display_name == command:
+                break
+        title = f"**/{language.commands[cmd].display_name}**"
+        if "arguments" in LANGUAGE_STRUCTURE['commands'][cmd]:
+            for argument in LANGUAGE_STRUCTURE['commands'][cmd]['arguments']:
+                if ARGUMENTS_REQUIRED[cmd][argument]:
+                    title += f" **<** `{language.commands[cmd].arguments[argument].display_name}` **>**"
+                else:
+                    title += f" **[** `{language.commands[cmd].arguments[argument].display_name}` **]**"
         embed = disnake.Embed(
-            title=command_help(command),
-            description=language.commands[command].description,
+            title=title,
+            description=language.commands[cmd].description,
             color=config.discord.embed.color.normal
         )
     embed.set_footer(text=language.required_optional_footer)
