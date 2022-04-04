@@ -43,7 +43,7 @@ async def help(
     )
 ):
     if command is None:
-        # generate help text for all commands
+        # Generate help text for all commands
         description = ""
         for command in LANGUAGE_STRUCTURE['commands']:
             description += f"\n**/{language.commands[command].display_name}**"
@@ -54,18 +54,18 @@ async def help(
                     else:
                         description += f" **[** `{language.commands[command].arguments[argument].display_name}` **]**"
             description += f"\n{language.commands[command].description}"
-        # create embed
+        # Create embed
         embed = disnake.Embed(
             title=language.commands.help.embed.title,
             description=description,
             color=config.discord.embed.color.normal
         )
     else:
-        # get original command name
+        # Get original command name
         for cmd in LANGUAGE_STRUCTURE['commands']:
             if language.commands[cmd].display_name == command:
                 break
-        # generate help text for a specific commands
+        # Generate help text for a specific commands
         title = f"**/{language.commands[cmd].display_name}**"
         if "arguments" in LANGUAGE_STRUCTURE['commands'][cmd]:
             for argument in LANGUAGE_STRUCTURE['commands'][cmd]['arguments']:
@@ -73,14 +73,14 @@ async def help(
                     title += f" **<** `{language.commands[cmd].arguments[argument].display_name}` **>**"
                 else:
                     title += f" **[** `{language.commands[cmd].arguments[argument].display_name}` **]**"
-        # create embed
+        # Create embed
         embed = disnake.Embed(
             title=title,
             description=language.commands[cmd].description,
             color=config.discord.embed.color.normal
         )
     embed.set_footer(text=language.required_optional_footer)
-    # send message
+    # Send message
     await inter.response.send_message(
         embed=embed,
         ephemeral=config.discord.embed.ephemeral
@@ -88,7 +88,7 @@ async def help(
 
 
 @bot.slash_command(
-    name=language.commands.top.display_name.lower(),
+    name=language.commands.top.display_name,
     description=language.commands.top.description
 )
 async def top(
@@ -96,7 +96,7 @@ async def top(
 ):
     with Cursor() as c:
         c.execute(
-            f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in ACTIONS])} DESC LIMIT 5"
+            f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC LIMIT 5"
         )
         mods = c.fetchall()
     if mods == []:
@@ -107,6 +107,7 @@ async def top(
             color=config.discord.embed.color.error
         )
     else:
+        # Create embed
         embed = disnake.Embed(
             title=language.commands.top.embed.title,
             color=config.discord.embed.color.normal
@@ -115,7 +116,7 @@ async def top(
             action_list = []
             actions = 0
             # Sort actions
-            for action in sorted(ACTIONS, key=lambda x: mod[x], reverse=True):
+            for action in sorted(LANGUAGE_STRUCTURE['actions'], key=lambda x: mod[x], reverse=True):
                 if mod[action] > 0:
                     actions += mod[action]
                     action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
@@ -124,6 +125,7 @@ async def top(
                 value="\n".join(action_list),
                 inline=False
             )
+    # Send message
     await inter.response.send_message(
         embed=embed,
         ephemeral=config.discord.embed.ephemeral
