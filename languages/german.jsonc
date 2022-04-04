@@ -8,8 +8,7 @@
             "arguments": {
                 "command": {
                     "display_name": "befehl",
-                    "description": "Der Befehl für den die Informationen angezeigt werden sollen",
-                    "marked_as_optional": true  // do not edit
+                    "description": "Der Befehl für den die Informationen angezeigt werden sollen"
                 }
             },
             "embed": {
@@ -29,8 +28,7 @@
             "arguments": {
                 "action": {
                     "display_name": "aktion",
-                    "description": "Aktion für die die aktivsten Mods angezeigt werden sollen",
-                    "marked_as_optional": true  // do not edit
+                    "description": "Aktion für die die aktivsten Mods angezeigt werden sollen"
                 }
             },
             "embed": {
@@ -49,8 +47,7 @@
             "arguments": {
                 "moderator": {
                     "display_name": "moderator",
-                    "description": "Der Twitch Benutzername eines Moderators",
-                    "marked_as_optional": false  // do not edit
+                    "description": "Der Twitch Benutzername eines Moderators"
                 }
             },
             "embed": {

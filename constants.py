@@ -47,3 +47,18 @@ ACTIONS = [
     "r9kbeta",
     "r9kbetaoff"
 ]
+
+# commands, arguments, required
+COMMANDS = {
+    "help": {
+        "command": True
+    },
+    "top": {},
+    "list": {
+        "action": True
+    },
+    "stats": {
+        "moderator": False
+    },
+    "about": {}
+}
