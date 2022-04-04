@@ -17,7 +17,6 @@ from disnake.ext import commands
 from config import config, language
 from constants import ARGUMENTS_REQUIRED, LANGUAGE_STRUCTURE
 from cursor import Cursor
-from utils import get_command
 
 
 log = logging.getLogger(__name__)
@@ -43,8 +42,8 @@ async def help(
         choices=[language.commands[command].display_name for command in LANGUAGE_STRUCTURE['commands']]
     )
 ):
-
     if command is None:
+        # generate help text for all commands
         description = ""
         for command in LANGUAGE_STRUCTURE['commands']:
             description += f"\n**/{language.commands[command].display_name}**"
@@ -55,15 +54,18 @@ async def help(
                     else:
                         description += f" **[** `{language.commands[command].arguments[argument].display_name}` **]**"
             description += f"\n{language.commands[command].description}"
+        # create embed
         embed = disnake.Embed(
             title=language.commands.help.embed.title,
             description=description,
             color=config.discord.embed.color.normal
         )
     else:
+        # get original command name
         for cmd in LANGUAGE_STRUCTURE['commands']:
             if language.commands[cmd].display_name == command:
                 break
+        # generate help text for a specific commands
         title = f"**/{language.commands[cmd].display_name}**"
         if "arguments" in LANGUAGE_STRUCTURE['commands'][cmd]:
             for argument in LANGUAGE_STRUCTURE['commands'][cmd]['arguments']:
@@ -71,12 +73,14 @@ async def help(
                     title += f" **<** `{language.commands[cmd].arguments[argument].display_name}` **>**"
                 else:
                     title += f" **[** `{language.commands[cmd].arguments[argument].display_name}` **]**"
+        # create embed
         embed = disnake.Embed(
             title=title,
             description=language.commands[cmd].description,
             color=config.discord.embed.color.normal
         )
     embed.set_footer(text=language.required_optional_footer)
+    # send message
     await inter.response.send_message(
         embed=embed,
         ephemeral=config.discord.embed.ephemeral
