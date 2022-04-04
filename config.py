@@ -8,15 +8,33 @@
 ##################################################################
 
 
-import os
 import logging
+import os
 
 import yaml
 from jsonc_parser.parser import JsoncParser
 from munch import munchify
 
+from constants import LANGUAGE_STRUCTURE
+
 
 log = logging.getLogger(__name__)
+
+
+def validate_languages(struct: dict, languages: dict) -> dict:
+    "Converts all data into the right format and checks if everything is there"
+    end = {}
+    for i in struct:
+        if isinstance(struct[i], dict):
+            end[i] = validate_languages(struct[i], languages[i])
+        else:
+            try:
+                end[i] = languages[i]
+                for j in struct[i]:
+                    end[i] = j(end[i])
+            except TypeError:
+                end[i] = struct[i](languages[i])
+    return end
 
 
 if os.getenv("RUN_IN_DOCKER"):
@@ -37,10 +55,13 @@ log.debug("Loaded config")
 # Load languages
 log.debug("Load languages")
 language = munchify(
-    JsoncParser.parse_file(
-        os.path.join(
-            config_path, "languages",
-            f"{config.language}.jsonc"
+    validate_languages(
+        LANGUAGE_STRUCTURE,
+        JsoncParser.parse_file(
+            os.path.join(
+                config_path, "languages",
+                f"{config.language}.jsonc"
+            )
         )
     )
 )

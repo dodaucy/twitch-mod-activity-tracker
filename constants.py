@@ -14,51 +14,103 @@ PUBSUB = "wss://pubsub-edge.twitch.tv"
 
 USER_AGENT = "Twitch Mod Activity Tracker"
 
-# ! oudated
-# IGNORE_CHANNELS = [
-#     "twitch"
-# ]
-
-# ! oudated
-# IGNORE_ACTIONS = [
-#     "MOD_USER",
-#     "UNMOD_USER",
-#     "VIP_USER",
-#     "UNVIP_USER",
-#     "RAID",
-#     "HOST"
-# ]
-
-ACTIONS = [
-    "clear",
-    "delete",
-    "timeout",
-    "untimeout",
-    "ban",
-    "unban",
-    "slow",
-    "slowoff",
-    "emoteonly",
-    "emoteonlyoff",
-    "followers",
-    "followersoff",
-    "subscribers",
-    "subscribersoff",
-    "r9kbeta",
-    "r9kbetaoff"
-]
-
-# commands, arguments, required
-COMMANDS = {
-    "help": {
-        "command": True
+# TODO: Check length
+# All stored functions or classes are executed
+LANGUAGE_STRUCTURE = {
+    "no_data": str,
+    "required_optional_footer": str,
+    "commands": {
+        "help": {
+            "display_name": (str, str.lower),
+            "description": str,
+            "arguments": {
+                "command": {
+                    "display_name": (str, str.lower),
+                    "description": str
+                }
+            },
+            "embed": {
+                "title": str
+            }
+        },
+        "top": {
+            "display_name": (str, str.lower),
+            "description": str,
+            "embed": {
+                "title": str
+            }
+        },
+        "list": {
+            "display_name": (str, str.lower),
+            "description": str,
+            "arguments": {
+                "action": {
+                    "display_name": (str, str.lower),
+                    "description": str
+                }
+            },
+            "embed": {
+                "title": str,
+                "total": str,
+                "specialized": {
+                    "title": str,
+                    "total": str,
+                    "no_action": str
+                }
+            }
+        },
+        "stats": {
+            "display_name": (str, str.lower),
+            "description": str,
+            "arguments": {
+                "moderator": {
+                    "display_name": (str, str.lower),
+                    "description": str
+                }
+            },
+            "embed": {
+                "title": str,
+                "total": str,
+                "mod_not_found": {
+                    "title": str,
+                    "description": str
+                }
+            }
+        },
+        "about": {
+            "display_name": str,
+            "description": str
+        }
     },
-    "top": {},
+    "actions": {
+        "clear": str,
+        "delete": str,
+        "timeout": str,
+        "untimeout": str,
+        "ban": str,
+        "slow": str,
+        "unban": str,
+        "slowoff": str,
+        "emoteonly": str,
+        "emoteonlyoff": str,
+        "followers": str,
+        "followersoff": str,
+        "subscribers": str,
+        "subscribersoff": str,
+        "r9kbeta": str,
+        "r9kbetaoff": str
+    }
+}
+
+# Arguments which are shown as required
+ARGUMENTS_REQUIRED = {
+    "help": {
+        "command": False
+    },
     "list": {
-        "action": True
+        "action": False
     },
     "stats": {
-        "moderator": False
-    },
-    "about": {}
+        "moderator": True
+    }
 }
