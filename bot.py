@@ -101,7 +101,7 @@ async def top(
         )
         mods = c.fetchall()
     if mods == []:
-        # No data
+        # No mods found
         embed = disnake.Embed(
             title=language.commands.top.embed.title,
             description=language.no_data,
@@ -123,7 +123,7 @@ async def top(
                     actions += mod[action]
                     action_list.append(f"{language.actions[action]}: **{mod[action]}**")
             embed.add_field(
-                name=f"{place + 1}. {mod['display_name']} | `{actions}`",
+                name=f"{place + 1}. {mod['login']} | `{actions}`",
                 value="\n".join(action_list),
                 inline=False
             )
@@ -155,7 +155,7 @@ async def list(
             )
             mods = c.fetchall()
         if mods == []:
-            # No data
+            # No mods found
             embed = disnake.Embed(
                 title=language.commands.top.embed.title,
                 description=language.no_data,
@@ -171,7 +171,7 @@ async def list(
                     total_actions += mod[action]
                     actions += mod[action]
                 if place <= 50:
-                    mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {actions}")
+                    mod_list.append(f"**{place + 1}.** `{mod['login']}`: {actions}")
             description = "\n".join(mod_list)
             # Create embed
             embed = disnake.Embed(
@@ -198,9 +198,9 @@ async def list(
                 break
             total_count += mod[original_action]
             if place <= 50:
-                mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {mod[original_action]}")
+                mod_list.append(f"**{place + 1}.** `{mod['login']}`: {mod[original_action]}")
         if mod_list == []:
-            # No data
+            # No mods found
             embed = disnake.Embed(
                 title=language.commands.list.embed.specialized.title.format(action=action),
                 description=language.commands.list.embed.specialized.no_action,
@@ -231,42 +231,41 @@ async def stats(
         description=language.commands.stats.arguments.moderator.description
     )
 ):
+    # Get mod
     with Cursor() as c:
         c.execute(
-            "SELECT * FROM actions WHERE mod_id = %s OR display_name = %s",
+            "SELECT * FROM actions WHERE mod_id = %s OR login = %s",
             (
-                moderator.lower(),
+                moderator,
                 moderator.lower()
             )
         )
         mod = c.fetchone()
     if mod is None:
+        # No mod found
         embed = disnake.Embed(
             title=language.commands.stats.embed.mod_not_found.title,
             description=language.commands.stats.embed.mod_not_found.description.format(mod=moderator),
             color=config.discord.embed.color.error
         )
-        await inter.response.send_message(
-            embed=embed,
-            ephemeral=config.discord.embed.ephemeral
-        )
     else:
         action_list = []
         total_actions = 0
-        for action in sorted(ACTIONS, key=lambda x: mod[x], reverse=True):
-            if mod[action] > 0:
-                total_actions += mod[action]
-                action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
+        for action in sorted(LANGUAGE_STRUCTURE['actions'], key=lambda x: mod[x], reverse=True):
+            if mod[action] == 0:
+                break
+            total_actions += mod[action]
+            action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
         description = "\n".join(action_list)
         embed = disnake.Embed(
-            title=language.commands.stats.embed.title.format(total=total_actions, mod=mod['display_name']),
-            description=f"{language.commands.stats.embed.total.format(total=total_actions, mod=mod['display_name'])}\n\n{description}",
+            title=language.commands.stats.embed.title.format(total=total_actions, mod=mod['login']),
+            description=f"{language.commands.stats.embed.total.format(total=total_actions, mod=mod['login'])}\n\n{description}",
             color=config.discord.embed.color.normal
         )
-        await inter.response.send_message(
-            embed=embed,
-            ephemeral=config.discord.embed.ephemeral
-        )
+    await inter.response.send_message(
+        embed=embed,
+        ephemeral=config.discord.embed.ephemeral
+    )
 
 
 if config.discord.enable_about_command:
