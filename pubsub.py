@@ -12,11 +12,11 @@ import asyncio
 import json
 import logging
 import time
-from broadcaster import Broadcaster
 
 import websockets
 
-from constants import PUBSUB, USER_AGENT, ACTIONS
+from broadcaster import Broadcaster
+from constants import LANGUAGE_STRUCTURE, PUBSUB, USER_AGENT
 from cursor import Cursor
 
 
@@ -27,6 +27,7 @@ broadcaster = Broadcaster()
 
 class PubSub:
     def run(self) -> None:
+        "Start pubsub"
         while True:
             self.loop = asyncio.new_event_loop()
             self.stop = False
@@ -46,6 +47,7 @@ class PubSub:
             log.debug("Loop closed")
 
     async def connect(self) -> None:
+        "Connect to pubsub"
         log.debug("Get acress...")
         token, mod_id, channel_id = await broadcaster.get_acress()
         log.debug(f"mod: {mod_id}, channel: {channel_id}")
@@ -68,10 +70,12 @@ class PubSub:
         }))
 
     def reconnect(self) -> None:
+        "Reconnect to pubsub"
         log.info("Reconnect...")
         self.stop = True
 
-    async def recv(self):
+    async def recv(self) -> None:
+        "Receive packets"
         while not self.stop:
             try:
                 msg = await asyncio.wait_for(self.ws.recv(), 10)  # TODO: maybe configurable
@@ -90,21 +94,21 @@ class PubSub:
                     message = json.loads(response['data']['message'])
                     if message['type'] == "moderation_action":
                         action = message['data']['moderation_action']
-                        if action in ACTIONS:
+                        if action in LANGUAGE_STRUCTURE['actions']:
                             with Cursor() as c:
                                 c.execute(
                                     f"""
                                     INSERT INTO actions
                                     (
                                         mod_id,
-                                        display_name,
-                                        {action}
+                                        login,
+                                        `{action}`
                                     )
                                     VALUES
                                     (
                                         %s, %s, 1
                                     )
-                                    ON DUPLICATE KEY UPDATE display_name = %s, {action} = {action} + 1
+                                    ON DUPLICATE KEY UPDATE login = %s, `{action}` = `{action}` + 1 
                                     """,
                                     (
                                         message['data']['created_by_user_id'],
@@ -129,6 +133,7 @@ class PubSub:
         log.debug("Recv closed")
 
     async def heartbeat(self):
+        "Maintain connection"
         try:
             while not self.stop:
                 await self.ws.send(json.dumps({"type": "PING"}))
@@ -140,6 +145,7 @@ class PubSub:
         log.debug("Heartbeat closed")
 
     async def check_pong(self):
+        "Check if connection is alive"
         while not self.stop:
             await asyncio.sleep(1)
             if self.last_ping is not None:
