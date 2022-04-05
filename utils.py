@@ -78,26 +78,6 @@ def refresh_all_tokens() -> None:
             log.debug(f"Token from {mod['id']} valid. Expires in {mod['expires'] - t} seconds")
 
 
-def get_command(command_display_name: str) -> str:
-    "Returns the original name of a command"
-    for command in language.commands:
-        if language.commands[command].display_name == command_display_name:
-            return command
-
-
-def command_help(command: str) -> str:
-    "Returns how a command should be used"
-    description = f"**/{language.commands[command].display_name}**"
-    if "arguments" in language.commands[command]:
-        description += " "
-        for argument in language.commands[command].arguments:
-            if language.commands[command].arguments[argument].marked_as_optional:
-                description += f"**[** `{language.commands[command].arguments[argument].display_name}` **]**"
-            else:
-                description += f"**<** `{language.commands[command].arguments[argument].display_name}` **>**"
-    return description
-
-
 def raise_on_error(
     response: requests.Response,
     ignore_message: Optional[str] = None
