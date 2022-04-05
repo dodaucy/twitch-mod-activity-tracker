@@ -46,6 +46,9 @@ async def help(
         # Generate help text for all commands
         description = ""
         for command in LANGUAGE_STRUCTURE['commands']:
+            if not config.discord.enable_about_command:
+                if command == "about":
+                    continue
             description += f"\n**/{language.commands[command].display_name}**"
             if "arguments" in LANGUAGE_STRUCTURE['commands'][command]:
                 for argument in LANGUAGE_STRUCTURE['commands'][command]['arguments']:
