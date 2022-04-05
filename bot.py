@@ -94,6 +94,7 @@ async def help(
 async def top(
     inter: disnake.ApplicationCommandInteraction
 ):
+    # Get mods
     with Cursor() as c:
         c.execute(
             f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC LIMIT 5"
@@ -112,6 +113,7 @@ async def top(
             title=language.commands.top.embed.title,
             color=config.discord.embed.color.normal
         )
+        # Add fields
         for place, mod in enumerate(mods):
             action_list = []
             actions = 0
@@ -119,7 +121,7 @@ async def top(
             for action in sorted(LANGUAGE_STRUCTURE['actions'], key=lambda x: mod[x], reverse=True):
                 if mod[action] > 0:
                     actions += mod[action]
-                    action_list.append(f"{language.actions.get(action, action)}: **{mod[action]}**")
+                    action_list.append(f"{language.actions[action]}: **{mod[action]}**")
             embed.add_field(
                 name=f"{place + 1}. {mod['display_name']} | `{actions}`",
                 value="\n".join(action_list),
@@ -133,22 +135,23 @@ async def top(
 
 
 @bot.slash_command(
-    name=language.commands.list.display_name.lower(),
+    name=language.commands.list.display_name,
     description=language.commands.list.description
 )
 async def list(
     inter: disnake.ApplicationCommandInteraction,
     action: Optional[str] = commands.Param(
         None,
-        name=language.commands.list.arguments.action.display_name.lower(),
+        name=language.commands.list.arguments.action.display_name,
         description=language.commands.list.arguments.action.description,
-        choices=[language.actions[action] for action in language.actions]
+        choices=[language.actions[action] for action in LANGUAGE_STRUCTURE['actions']]
     )
 ):
     if action is None:
+        # Get mods
         with Cursor() as c:
             c.execute(
-                f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in ACTIONS])} DESC"
+                f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC"
             )
             mods = c.fetchall()
         if mods == []:
@@ -159,59 +162,58 @@ async def list(
                 color=config.discord.embed.color.error
             )
         else:
+            # List all actions
             mod_list = []
             total_actions = 0
             for place, mod in enumerate(mods):
                 actions = 0
-                for action in ACTIONS:
+                for action in LANGUAGE_STRUCTURE['actions']:
                     total_actions += mod[action]
                     actions += mod[action]
                 if place <= 50:
                     mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {actions}")
             description = "\n".join(mod_list)
+            # Create embed
             embed = disnake.Embed(
                 title=language.commands.list.embed.title,
                 description=f"{language.commands.list.embed.total.format(total=total_actions)}\n\n{description}",
                 color=config.discord.embed.color.normal
             )
     else:
-        mod_list = []
-        total_count = 0
-        for translated_action in language.actions:
-            if language.actions[translated_action] == action:
+        # Get original action name
+        for original_action in LANGUAGE_STRUCTURE['actions']:
+            if language.actions[original_action] == action:
                 break
+        # Get mods
         with Cursor() as c:
             c.execute(
-                f"SELECT * FROM actions ORDER BY `{translated_action}` DESC"
+                f"SELECT * FROM actions ORDER BY `{original_action}` DESC"
             )
             mods = c.fetchall()
-        actions = {}
-        for mod in mods:
-            for raw_action in ACTIONS:
-                if mod[raw_action] > 0:
-                    if raw_action not in actions:
-                        actions[raw_action] = {}
-                    actions[raw_action][mod['mod_id']] = mod[raw_action]
-        if translated_action in actions:
-            for place, mod in enumerate(mods):
-                if mod[translated_action] == 0:
-                    break
-                total_count += mod[translated_action]
-                if place >= 50:
-                    continue
-                mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {mod[translated_action]}")
+        # Generate top list
+        mod_list = []
+        total_count = 0
+        for place, mod in enumerate(mods):
+            if mod[original_action] == 0:
+                break
+            total_count += mod[original_action]
+            if place <= 50:
+                mod_list.append(f"**{place + 1}.** `{mod['display_name']}`: {mod[original_action]}")
+        if mod_list == []:
+            # No data
+            embed = disnake.Embed(
+                title=language.commands.list.embed.specialized.title.format(action=action),
+                description=language.commands.list.embed.specialized.no_action,
+                color=config.discord.embed.color.error
+            )
+        else:
             description = "\n".join(mod_list)
             embed = disnake.Embed(
                 title=language.commands.list.embed.specialized.title.format(total=total_count, action=action),
                 description=f"{language.commands.list.embed.specialized.total.format(total=total_count, action=action)}\n\n{description}",
                 color=config.discord.embed.color.normal
             )
-        else:
-            embed = disnake.Embed(
-                title=language.commands.list.embed.specialized.title.format(action=action),
-                description=language.commands.list.embed.specialized.no_action,
-                color=config.discord.embed.color.error
-            )
+    # Send message
     await inter.response.send_message(
         embed=embed,
         ephemeral=config.discord.embed.ephemeral
