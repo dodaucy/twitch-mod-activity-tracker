@@ -108,7 +108,10 @@ class PubSub:
                                     (
                                         %s, %s, 1
                                     )
-                                    ON DUPLICATE KEY UPDATE login = %s, `{action}` = `{action}` + 1 
+                                    ON DUPLICATE KEY
+                                    UPDATE
+                                        login = %s,
+                                        `{action}` = `{action}` + 1
                                     """,
                                     (
                                         message['data']['created_by_user_id'],

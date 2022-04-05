@@ -129,7 +129,11 @@ async def verify(
             (
                 %s, %s, %s, %s
             )
-            ON DUPLICATE KEY UPDATE token = %s, refresh_token = %s, expires = %s
+            ON DUPLICATE KEY
+            UPDATE
+                token = %s,
+                refresh_token = %s,
+                expires = %s
             """,
             (
                 j['user_id'],

@@ -100,7 +100,12 @@ async def top(
     # Get mods
     with Cursor() as c:
         c.execute(
-            f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC LIMIT 5"
+            f"""
+            SELECT *
+            FROM actions
+            ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC
+            LIMIT 5
+            """
         )
         mods = c.fetchall()
     if mods == []:
@@ -154,7 +159,15 @@ async def list(
         # Get mods
         with Cursor() as c:
             c.execute(
-                f"SELECT * FROM actions ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC"
+                f"""
+                SELECT *
+                FROM actions
+                WHERE login != %s
+                ORDER BY {' + '.join([f'`{action}`' for action in LANGUAGE_STRUCTURE['actions']])} DESC
+                """,
+                (
+                    "" if config.ignore_broadcaster else "",
+                )
             )
             mods = c.fetchall()
         if mods == []:
@@ -190,7 +203,11 @@ async def list(
         # Get mods
         with Cursor() as c:
             c.execute(
-                f"SELECT * FROM actions ORDER BY `{original_action}` DESC"
+                f"""
+                SELECT *
+                FROM actions
+                ORDER BY `{original_action}` DESC
+                """
             )
             mods = c.fetchall()
         # Generate top list
@@ -237,7 +254,11 @@ async def stats(
     # Get mod
     with Cursor() as c:
         c.execute(
-            "SELECT * FROM actions WHERE mod_id = %s OR login = %s",
+            """
+            SELECT *
+            FROM actions
+            WHERE mod_id = %s OR login = %s
+            """,
             (
                 moderator,
                 moderator.lower()

@@ -50,7 +50,10 @@ class Broadcaster:
                     log.info(f"Token from {mod['id']} expired")
                     with Cursor() as c:
                         c.execute(
-                            "DELETE FROM mods WHERE id = %s",
+                            """
+                            DELETE FROM mods
+                            WHERE id = %s
+                            """,
                             (
                                 mod['id'],
                             )

@@ -37,7 +37,10 @@ def refresh_all_tokens() -> None:
             log.info(f"Token from {mod['id']} expired")
             with Cursor() as c:
                 c.execute(
-                    "DELETE FROM mods WHERE token = %s",
+                    """
+                    DELETE FROM mods
+                    WHERE token = %s
+                    """,
                     (
                         mod['token'],
                     )
@@ -57,7 +60,10 @@ def refresh_all_tokens() -> None:
             with Cursor() as c:
                 if "message" in j:
                     c.execute(
-                        "DELETE FROM mods WHERE id = %s",
+                        """
+                        DELETE FROM mods
+                        WHERE id = %s
+                        """,
                         (
                             mod['id'],
                         )
@@ -65,7 +71,13 @@ def refresh_all_tokens() -> None:
                     log.debug(f"Token from {mod['id']} is invalid")
                 else:
                     c.execute(
-                        "UPDATE mods SET token = %s, refresh_token = %s, expires = %s WHERE id = %s",
+                        """
+                        UPDATE mods SET
+                            token = %s,
+                            refresh_token = %s,
+                            expires = %s
+                        WHERE id = %s
+                        """,
                         (
                             j['access_token'],
                             j['refresh_token'],
