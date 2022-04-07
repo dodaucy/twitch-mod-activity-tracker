@@ -71,8 +71,8 @@ async def index(request: Request):
 async def auth():
     return RedirectResponse(join_args(
         "https://id.twitch.tv/oauth2/authorize",  # TODO: in constants.py
-        client_id=config.twitch.client_id,
-        redirect_uri=config.twitch.redirect_uri,
+        client_id=config.twitch_app.client_id,
+        redirect_uri=config.twitch_app.redirect_uri,
         response_type="code",
         scope=SCOPE,
         state=authentication.add()
@@ -97,11 +97,11 @@ async def verify(
     r = session.post(
         "https://id.twitch.tv/oauth2/token",  # TODO: in constants.py
         params={
-            "client_id": config.twitch.client_id,
-            "client_secret": config.twitch.client_secret,
+            "client_id": config.twitch_app.client_id,
+            "client_secret": config.twitch_app.client_secret,
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": config.twitch.redirect_uri
+            "redirect_uri": config.twitch_app.redirect_uri
         }
     )
     j = raise_on_error(r)
