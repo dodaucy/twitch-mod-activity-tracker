@@ -15,6 +15,7 @@ import uuid
 from fastapi import status
 
 
+# Enable logging
 log = logging.getLogger(__name__)
 
 

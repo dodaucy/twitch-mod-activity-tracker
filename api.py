@@ -12,30 +12,39 @@ import logging
 import time
 
 import requests
+import uvloop
 from fastapi import FastAPI, Request, status
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 
 from auth import Auth, AuthError
-from cursor import Cursor
 from config import config
 from constants import SCOPE, USER_AGENT
+from cursor import Cursor
 from utils import join_args, raise_on_error
 
 
+# Enable uvloop
+uvloop.install()
+
+# Enable logging
 log = logging.getLogger(__name__)
 
+# Create app
 app = FastAPI(
     docs_url=None,
     redoc_url=None,
     openapi_url=None
 )
 
+# Create requests session
 session = requests.Session()
 session.headers = {"User-Agent": USER_AGENT}
 
+# Create auth instance
 authentication = Auth()
 
+# Create templates
 templates = Jinja2Templates(directory="templates")
 
 

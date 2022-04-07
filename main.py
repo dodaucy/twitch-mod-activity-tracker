@@ -14,6 +14,7 @@ import threading
 
 import coloredlogs
 import uvicorn
+import uvloop
 from disnake.ext import commands, tasks
 
 from api import app, authentication
@@ -24,16 +25,20 @@ from pubsub import PubSub
 from utils import refresh_all_tokens
 
 
+# Enable uvloop
+uvloop.install()
+
+
 # Enable logging
 coloredlogs.install(
     level=logging.DEBUG,
     fmt="[%(asctime)s] [%(threadName)s/%(levelname)s] [%(name)s.%(funcName)s:%(lineno)s]: %(message)s",  # TODO: configurable
     isatty=sys.stderr.isatty()
 )
-
-
 log = logging.getLogger(__name__)
 
+
+# Create broadcaster instance
 broadcaster = Broadcaster()
 
 

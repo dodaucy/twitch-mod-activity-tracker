@@ -19,6 +19,7 @@ from constants import ARGUMENTS_REQUIRED, LANGUAGE_STRUCTURE
 from cursor import Cursor
 
 
+# Enable logging
 log = logging.getLogger(__name__)
 
 

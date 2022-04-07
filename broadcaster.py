@@ -8,17 +8,22 @@
 ##################################################################
 
 
-import logging
 import asyncio
+import logging
 
 import requests
+import uvloop
 
 from config import config
 from constants import USER_AGENT
-from utils import raise_on_error
 from cursor import Cursor
+from utils import raise_on_error
 
 
+# Enable uvloop
+uvloop.install()
+
+# Enable logging
 log = logging.getLogger(__name__)
 
 

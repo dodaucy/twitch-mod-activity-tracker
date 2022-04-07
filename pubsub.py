@@ -13,12 +13,17 @@ import json
 import logging
 import time
 
+import uvloop
 import websockets
 
 from constants import LANGUAGE_STRUCTURE, PUBSUB, USER_AGENT
 from cursor import Cursor
 
 
+# Enable uvloop
+uvloop.install()
+
+# Enable logging
 log = logging.getLogger(__name__)
 
 

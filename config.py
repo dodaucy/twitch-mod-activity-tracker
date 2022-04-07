@@ -18,6 +18,7 @@ from munch import munchify
 from constants import LANGUAGE_STRUCTURE
 
 
+# Enable logging
 log = logging.getLogger(__name__)
 
 
@@ -37,6 +38,7 @@ def validate_languages(struct: dict, languages: dict) -> dict:
     return end
 
 
+# Get config path
 if os.getenv("RUN_IN_DOCKER"):
     log.info("Docker detected")
     config_path = "/config"

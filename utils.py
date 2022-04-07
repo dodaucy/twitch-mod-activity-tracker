@@ -15,12 +15,14 @@ from urllib.parse import quote_plus
 
 import requests
 
-from config import config, language
+from config import config
 from cursor import Cursor
 
 
+# Enable logging
 log = logging.getLogger(__name__)
 
+# Create requests session
 session = requests.session()
 
 
@@ -106,6 +108,7 @@ def raise_on_error(
 
 
 def join_args(url: str, *args, **kwargs) -> str:
+    "Concatenates a URL with arguments"
     if not args and not kwargs:
         return url
     args = [quote_plus(arg) for arg in args]
