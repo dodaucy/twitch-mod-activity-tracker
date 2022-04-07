@@ -14,10 +14,11 @@ import threading
 
 import coloredlogs
 import uvicorn
-from disnake.ext import tasks
+from disnake.ext import commands, tasks
 
 from api import app, authentication
-from bot import bot
+from bot import Cog
+from broadcaster import Broadcaster
 from config import config
 from pubsub import PubSub
 from utils import refresh_all_tokens
@@ -32,6 +33,8 @@ coloredlogs.install(
 
 
 log = logging.getLogger(__name__)
+
+broadcaster = Broadcaster()
 
 
 # Disable DEBUG and INFO log for discord
@@ -92,9 +95,15 @@ log.debug("Start pubsub...")
 pubsub = PubSub()
 threading.Thread(
     target=pubsub.run,
+    args=(
+        broadcaster,
+    ),
     daemon=True
 ).start()
 
 
 # Start discord bot
-bot.run(config.discord.token)
+bot = commands.Bot()
+cog = Cog(bot, broadcaster)
+bot.add_cog(cog)
+bot.run(config.discord_bot.token)

@@ -15,19 +15,17 @@ import time
 
 import websockets
 
-from broadcaster import Broadcaster
 from constants import LANGUAGE_STRUCTURE, PUBSUB, USER_AGENT
 from cursor import Cursor
 
 
 log = logging.getLogger(__name__)
 
-broadcaster = Broadcaster()
-
 
 class PubSub:
-    def run(self) -> None:
+    def run(self, broadcaster) -> None:
         "Start pubsub"
+        self.broadcaster = broadcaster
         while True:
             self.loop = asyncio.new_event_loop()
             self.stop = False
@@ -49,7 +47,7 @@ class PubSub:
     async def connect(self) -> None:
         "Connect to pubsub"
         log.debug("Get acress...")
-        token, mod_id, channel_id = await broadcaster.get_acress()
+        token, mod_id, channel_id = await self.broadcaster.get_acress()
         log.debug(f"mod: {mod_id}, channel: {channel_id}")
         log.debug("Connect to websocket...")
         self.ws = await websockets.connect(
