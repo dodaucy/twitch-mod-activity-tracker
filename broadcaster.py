@@ -27,9 +27,10 @@ class Broadcaster:
         self.session = requests.Session()
         self.session.headers = {"User-Agent": USER_AGENT}
         self.ready = False
-        log.info(f"Loaded broadcaster {config.twitch.channel.lower()}")
+        log.info(f"Loaded broadcaster {config.channel.lower()}")
 
-    async def get_acress(self):
+    async def get_acress(self) -> None:
+        ""
         while True:
             with Cursor() as c:
                 c.execute(
@@ -37,45 +38,61 @@ class Broadcaster:
                 )
                 mods = c.fetchall()
             for mod in mods:
-                r = self.session.get(
-                    "https://api.twitch.tv/helix/users",  # TODO: in constants.py
-                    headers={
-                        "Authorization": f"Bearer {mod['token']}",
-                        "Client-Id": config.twitch.client_id
-                    }
-                )
-                log.debug(f"HTTP response: {r.text.strip()}")
-                j = raise_on_error(r, "Invalid OAuth token")
-                if "message" in j:
-                    log.info(f"Token from {mod['id']} expired")
-                    with Cursor() as c:
-                        c.execute(
-                            """
-                            DELETE FROM mods
-                            WHERE id = %s
-                            """,
-                            (
-                                mod['id'],
-                            )
-                        )
-                    continue
+                # ! oudated
+                # r = self.session.get(
+                #     "https://api.twitch.tv/helix/users",  # TODO: in constants.py
+                #     headers={
+                #         "Authorization": f"Bearer {mod['token']}",
+                #         "Client-Id": config.twitch_app.client_id
+                #     }
+                # )
+                # log.debug(f"HTTP response: {r.text.strip()}")
+                # j = raise_on_error(r, "Invalid OAuth token")
+                # if "message" in j:
+                #     log.info(f"Token from {mod['id']} expired")
+                #     with Cursor() as c:
+                #         c.execute(
+                #             """
+                #             DELETE FROM mods
+                #             WHERE id = %s
+                #             """,
+                #             (
+                #                 mod['id'],
+                #             )
+                #         )
+                #     continue
                 if not self.ready:
                     # get infos about the broadcaster
-                    log.debug(f"Get infos for {config.twitch.channel.lower()}...")
+                    log.debug(f"Get infos for {config.channel.lower()}...")
                     r = self.session.get(
-                        f"https://api.twitch.tv/helix/users?login={config.twitch.channel.lower()}",  # TODO: in constants.py
+                        f"https://api.twitch.tv/helix/users?login={config.channel.lower()}",  # TODO: in constants.py
                         headers={
                             "Authorization": f"Bearer {mod['token']}",
-                            "Client-Id": config.twitch.client_id
+                            "Client-Id": config.twitch_app.client_id
                         }
                     )
                     log.debug(f"HTTP response: {r.text.strip()}")
-                    j = raise_on_error(r)
+                    j = raise_on_error(r, "Invalid OAuth token")
+                    if "message" in j:
+                        log.info(f"Token from {mod['id']} expired")
+                        with Cursor() as c:
+                            c.execute(
+                                """
+                                DELETE FROM mods
+                                WHERE id = %s
+                                """,
+                                (
+                                    mod['id'],
+                                )
+                            )
+                        continue
+                    if j['data'] == []:
+                        continue
                     self.id = j['data'][0]['id']
                     self.display_name = j['data'][0]['display_name']
                     self.image = j['data'][0]['profile_image_url']
                     log.info(f"Loaded infos for {self.display_name} ({self.id})")
                     self.ready = True
                 return mod['token'], j['data'][0]['id'], self.id
-            log.warning(f"No valid tokens found for {config.twitch.channel}. Try again soon...")
+            log.warning(f"No valid tokens found for {config.channel}. Try again soon...")
             await asyncio.sleep(60)  # TODO: configurable
