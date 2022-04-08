@@ -114,6 +114,12 @@ async def verify(
         }
     )
     j = raise_on_error(r)
+    if SCOPE not in r['scope']:
+        raise AuthError(
+            "The token is missing the scope",
+            "Please repeat the authentication",
+            status.HTTP_400_BAD_REQUEST
+        )
     token = j['access_token']
     refresh_token = j['refresh_token']
     r = session.get(
