@@ -2,6 +2,10 @@
 
 A discord bot that can show the activity of twitch moderators in a specific channel.
 
+## ⚠️ WARNING ⚠️
+
+The project contains bugs and work is currently suspended!
+
 ## Create and invite a bot
 
 1. Go to the [discord developer portal](https://discord.com/developers/applications "discord developer portal").
